@@ -1,8 +1,19 @@
 import type { AuthProvider } from "@refinedev/core";
-import { getClientTwo } from "./util/client";
+import { getClient, getClientTwo } from "./util/client";
 import { signinMutation } from "./util/graphql/auth";
 
 export const TOKEN_KEY = "refine-auth";
+
+type AuthActionResponse = {
+  success: boolean;
+  redirectTo: string;
+};
+
+type AuthRequestResponse = {
+  signin: {
+    token: string;
+  };
+};
 
 type LoginRequestType = {
   email: string;
@@ -25,32 +36,40 @@ export const loginRequest = async ({
   }
 };
 export const authProvider: AuthProvider = {
-  login: async ({ username, email, password }) => {
-    if ((username || email) && password) {
-      localStorage.setItem(TOKEN_KEY, username);
-      return {
-        success: true,
-        redirectTo: "/",
-      };
-    }
+  login: async ({
+    email,
+    password,
+  }: LoginRequestType): Promise<AuthActionResponse> => {
+    try {
+      const result: AuthRequestResponse =  await getClientTwo().request(signinMutation, {
+        email,
+        password,
+      });
 
-    return {
-      success: false,
-      error: {
-        name: "LoginError",
-        message: "Invalid username or password",
-      },
-    };
+      const {  token } = result.signin;
+
+      localStorage.setItem(
+        import.meta.env.VITE_TOKEN_KEY,
+        token
+      );
+      
+
+      getClient(false, );
+
+      return { success: true, redirectTo: "/home" };
+    } catch (error) {
+      return Promise.reject(error);
+    }
   },
   logout: async () => {
-    localStorage.removeItem(TOKEN_KEY);
+    localStorage.removeItem(import.meta.env.VITE_TOKEN_KEYimport.meta.env.VITE_TOKEN_KEY);
     return {
       success: true,
       redirectTo: "/login",
     };
   },
   check: async () => {
-    const token = localStorage.getItem(TOKEN_KEY);
+    const token = localStorage.getItem(import.meta.env.VITE_TOKEN_KEY);
     if (token) {
       return {
         authenticated: true,
@@ -64,7 +83,7 @@ export const authProvider: AuthProvider = {
   },
   getPermissions: async () => null,
   getIdentity: async () => {
-    const token = localStorage.getItem(TOKEN_KEY);
+    const token = localStorage.getItem(import.meta.env.VITE_TOKEN_KEYimport.meta.env.VITE_TOKEN_KEY);
     if (token) {
       return {
         id: 1,

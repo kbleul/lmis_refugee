@@ -1,15 +1,12 @@
-import { useTranslate } from "@refinedev/core";
-import React, { useState } from "react";
+import { useLogin, useTranslate } from "@refinedev/core";
+import React, { useEffect, useState } from "react";
 import { useForm } from "react-hook-form";
 import { toast, ToastContainer } from "react-toastify";
 import "react-toastify/dist/ReactToastify.css";
 import ClipLoader from "react-spinners/ClipLoader";
-import { IoIosArrowRoundForward } from "react-icons/io";
 import { AiOutlineEyeInvisible } from "react-icons/ai";
 import { PiEyeLight } from "react-icons/pi";
-import { loginRequest } from "../../authProvider";
-import { pareseError } from "../../util/methods/errorHandler";
-import { Link } from "react-router-dom";
+
 
 type LoginFormInputs = {
   email: string;
@@ -26,7 +23,7 @@ export const CustomLoginPage: React.FC = () => {
   const [isFocusedEmail, setIsFocusedEmail] = useState(false);
   const [isFocusedPass, setIsFocusedPass] = useState(false);
   const [showPassword, setShowPassword] = useState(false);
-  const [isLoading, setIsLoading] = useState(false);
+  const { mutate: login, isLoading, isError } = useLogin();
 
   const {
     register,
@@ -36,22 +33,18 @@ export const CustomLoginPage: React.FC = () => {
   const translate = useTranslate();
 
   const onSubmit = async (data: LoginFormInputs) => {
-    setIsLoading(true);
-    const result = await loginRequest(data);
-    if (result.error) {
-      toast.error(
-        translate(
-          "pages.login.errors.invalid",
-          pareseError(result) ? pareseError(result) : "Invalid credentials"
-        )
-      );
-    }
-    if (result.success) {
-      toast.success("Login request successful. Code sent to your email");
-    }
+    login({ ...data });
 
-    setIsLoading(false);
+
   };
+
+ 
+
+  useEffect(() => {
+    if (isError) {
+      toast.error(translate("pages.login.errors.invalid", "Wrong OTP"));
+    }
+  }, [isError, translate]);
 
   return (
     <article className="flex h-screen justify-center items-center">
