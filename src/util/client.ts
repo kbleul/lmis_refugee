@@ -7,7 +7,8 @@ const TOKEN_KEY = import.meta.env.VITE_TOKEN_KEY;
 let client: GraphQLClient | null = null;
 
 
-export const getClient = (reset: boolean, token?: string, ) => {
+export const 
+getClient = (reset: boolean, token?: string, ) => {
   if (reset) {
     client = new GraphQLClient(API_URL, {
       headers: {

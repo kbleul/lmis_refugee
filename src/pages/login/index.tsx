@@ -50,9 +50,9 @@ export const CustomLoginPage: React.FC = () => {
           onSubmit={handleSubmit(onSubmit)}
           className="w-full flex justify-center items-center"
         >
-          <div className="flex flex-col rounded-[40px] pt-12 text-black shadow-2xl max-w-[800px] w-1/2 px-[8%] py-8 pb-24">
+          <div className="flex flex-col rounded-[40px] pt-12 text-black xl:shadow-2xl max-w-[800px] xl:w-1/2 px-[8%] py-8 pb-24">
 
-            <h6 className="text-[32px] font-semibold">Login to your account</h6>
+            <h6 className="text-2xl lg:text-[32px] font-semibold">Login to your account</h6>
             <label
               htmlFor="email-input"
               className="mt-8 mb-2 flex justify-start"
