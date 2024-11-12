@@ -55,6 +55,7 @@ export const authProvider: AuthProvider = {
   },
   logout: async () => {
     Cookies.remove(TOKEN_KEY);
+    getClient(true);
 
     return {
       success: true,
