@@ -34,15 +34,13 @@ export const CustomLoginPage: React.FC = () => {
 
   const onSubmit = async (data: LoginFormInputs) => {
     login({ ...data });
-
-
   };
 
  
 
   useEffect(() => {
     if (isError) {
-      toast.error(translate("pages.login.errors.invalid", "Wrong OTP"));
+      toast.error(translate("pages.login.errors.invalid", "Invalide credentials"));
     }
   }, [isError, translate]);
 

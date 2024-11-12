@@ -1,17 +1,11 @@
 import { GraphQLClient } from "graphql-request";
+import Cookies from "js-cookie";
 
 const API_URL = import.meta.env.VITE_GRAPHQL_ENDPOINT;
+const TOKEN_KEY = import.meta.env.VITE_TOKEN_KEY;
 
 let client: GraphQLClient | null = null;
 
-export const getClientTwo = () => {
-  return new GraphQLClient(API_URL, {
-    headers: {
-      "content-type": "application/json",
-      "x-hasura-admin-secret": import.meta.env.VITE_HASURA_ADMIN_KEY
-    },
-  });
-}
 
 export const getClient = (reset: boolean, token?: string, ) => {
   if (reset) {
@@ -22,7 +16,7 @@ export const getClient = (reset: boolean, token?: string, ) => {
     });
   }
 
-  const savedToken = localStorage.getItem(import.meta.env.VITE_TOKEN_KEY);
+  const savedToken = Cookies.get(TOKEN_KEY);
 
   if (client) {
     if (savedToken || token) {

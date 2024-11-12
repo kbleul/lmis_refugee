@@ -67,3 +67,15 @@ export const AddRefugeeMutation = gql`
     }
   }
 `;
+
+export const UPLOAD_FILE = gql`
+  mutation UPLOAD_FILE(
+    $extension: String!
+    $file: String!
+    $folder_id: String!
+  ) {
+    fileUpload(extension: $extension, file: $file, folder_id: $folder_id) {
+      path
+    }
+  }
+`;

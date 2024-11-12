@@ -1,5 +1,5 @@
-import { getClientTwo } from "../client";
-import { AddRefugeeMutation } from "../graphql/home";
+import { getClient } from "../client";
+import { AddRefugeeMutation, UPLOAD_FILE } from "../graphql/home";
 
 export const addRefugeeRequest = async ({
   first_name,
@@ -21,7 +21,7 @@ export const addRefugeeRequest = async ({
   created_by,
 }: any) => {
   try {
-    await getClientTwo().request(AddRefugeeMutation, {
+    await getClient(false).request(AddRefugeeMutation, {
       first_name,
       last_name,
       gender_id,
@@ -39,6 +39,20 @@ export const addRefugeeRequest = async ({
       is_spouse_or_child_citizen_et,
       preferred_job_title,
       created_by,
+    });
+
+    return { success: "success" };
+  } catch (error: any) {
+    return { error: error?.message };
+  }
+};
+
+export const useFileUpload = async ({ extension, file, folder_id }: any) => {
+  try {
+    await getClient(false).request(UPLOAD_FILE, {
+      extension,
+      file,
+      folder_id,
     });
 
     return { success: "success" };

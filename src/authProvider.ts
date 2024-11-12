@@ -1,8 +1,9 @@
 import type { AuthProvider } from "@refinedev/core";
-import { getClient, getClientTwo } from "./util/client";
+import { getClient } from "./util/client";
 import { signinMutation } from "./util/graphql/auth";
+import Cookies from "js-cookie";
 
-export const TOKEN_KEY = "refine-auth";
+export const TOKEN_KEY = import.meta.env.VITE_TOKEN_KEY;
 
 type AuthActionResponse = {
   success: boolean;
@@ -20,41 +21,32 @@ type LoginRequestType = {
   password: string;
 };
 
-export const loginRequest = async ({
-  email,
-  password,
-}: LoginRequestType) => {
-  try {
-    await getClientTwo().request(signinMutation, {
-      email,
-      password,
-    });
-
-    return { success: "success" };
-  } catch (error: any) {
-    return { error: error?.message };
-  }
-};
 export const authProvider: AuthProvider = {
   login: async ({
     email,
     password,
   }: LoginRequestType): Promise<AuthActionResponse> => {
     try {
-      const result: AuthRequestResponse =  await getClientTwo().request(signinMutation, {
-        email,
-        password,
+      const result: AuthRequestResponse = await getClient(false).request(
+        signinMutation,
+        {
+          email,
+          password,
+        }
+      );
+      const { token } = result.signin;
+
+      if (!token) {
+        return Promise.reject();
+      }
+
+      Cookies.set(TOKEN_KEY, token, {
+        expires: 7,
+        secure: true,
+        sameSite: "Strict",
       });
 
-      const {  token } = result.signin;
-
-      localStorage.setItem(
-        import.meta.env.VITE_TOKEN_KEY,
-        token
-      );
-      
-
-      getClient(false, );
+      getClient(false);
 
       return { success: true, redirectTo: "/home" };
     } catch (error) {
@@ -62,14 +54,15 @@ export const authProvider: AuthProvider = {
     }
   },
   logout: async () => {
-    localStorage.removeItem(import.meta.env.VITE_TOKEN_KEYimport.meta.env.VITE_TOKEN_KEY);
+    Cookies.remove(TOKEN_KEY);
+
     return {
       success: true,
       redirectTo: "/login",
     };
   },
   check: async () => {
-    const token = localStorage.getItem(import.meta.env.VITE_TOKEN_KEY);
+    const token = Cookies.get(TOKEN_KEY);
     if (token) {
       return {
         authenticated: true,
@@ -83,7 +76,7 @@ export const authProvider: AuthProvider = {
   },
   getPermissions: async () => null,
   getIdentity: async () => {
-    const token = localStorage.getItem(import.meta.env.VITE_TOKEN_KEYimport.meta.env.VITE_TOKEN_KEY);
+    const token = localStorage.getItem(TOKEN_KEY);
     if (token) {
       return {
         id: 1,
