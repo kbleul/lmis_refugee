@@ -12,8 +12,7 @@ import { AiOutlineDelete, AiOutlineUpload } from "react-icons/ai";
 import { useSelect } from "@refinedev/core";
 import Loader from "../../components/loader";
 
-export const SELECT_QUERY = ["id", "name"]
-
+export const SELECT_QUERY = ["id", "name"];
 
 type FormInputs = {
   first_name: string;
@@ -62,14 +61,15 @@ const Home = () => {
     },
   });
 
-  const { query: queryMaritailStatus } = useSelect<{ id: string; name: string }>({
+  const { query: queryMaritailStatus } = useSelect<{
+    id: string;
+    name: string;
+  }>({
     resource: "base_marital_statuses",
     meta: {
       fields: SELECT_QUERY,
     },
   });
-
-
 
   // Handle the file upload and update the profile image
   const handleImageChange = (event: React.ChangeEvent<HTMLInputElement>) => {
@@ -180,7 +180,7 @@ const Home = () => {
                 </div>
               </div>
             </div>
-            <div className="relative w-[12rem] h-36 ml-10">
+            <div className="relative w-36 h-36 ml-10">
               {/* Profile Image */}
               <img
                 src={profileImage}
@@ -277,27 +277,29 @@ const Home = () => {
                   </div>
 
                   <select
-              {...register("gender_id", {
-                required: "This field is required",
-              })}
-              className="ml-5 w-36"
-            >
-              {queryGender?.data?.data?.map(
-                (option: { name: string; id: string }) => (
-                  <option value={option.id} key={option.id} className="px-4" >
-                    {option.name}
-                  </option>
-                )
-              )}
-            </select>
+                    {...register("gender_id", {
+                      required: "This field is required",
+                    })}
+                    className="ml-8 w-46 px-16 border-2  border-gray-300 rounded-lg "
+                  >
+                    {queryGender?.data?.data?.map(
+                      (option: { name: string; id: string }) => (
+                        <option
+                          value={option.id}
+                          key={option.id}
+                          className="px-4"
+                        >
+                          {option.name}
+                        </option>
+                      )
+                    )}
+                  </select>
 
-            
-                 
                   {/* Date of Birth Section */}
                   <div className="flex flex-row items-center ml-16">
                     <div>
                       <IoCalendarOutline className="text-[#2C7FE0] mt-1" />
-                    </div> 
+                    </div>
                     <div className="flex flex-col ml-2">
                       <div className="text-[15px] font-bold text-gray-500">
                         Date of Birth *
@@ -315,7 +317,7 @@ const Home = () => {
                       {...register("date_of_birth", {
                         required: "Date of Birth is required",
                       })}
-                      className="bg-gray-50 border border-gray-300 text-gray-900 text-sm rounded-lg focus:ring-blue-500 focus:border-blue-500 block w-full p-2.5 dark:placeholder-gray-400 dark:focus:ring-blue-500 dark:focus:border-blue-500"
+                      className=" w-46 px-6   bg-gray-50 border border-gray-300 text-gray-900 text-sm rounded-lg focus:ring-blue-500 focus:border-blue-500 block w-full p-2.5 dark:placeholder-gray-400 dark:focus:ring-blue-500 dark:focus:border-blue-500"
                       placeholder="Select date"
                     />
                   </div>
@@ -336,21 +338,20 @@ const Home = () => {
               </div>
 
               <select
-              {...register("nationality_id", {
-                required: "This field is required",
-              })}
-              className="ml-5 w-[12rem]"
-            >
-              {queryNationality?.data?.data?.map(
-                (option: { name: string; id: string }) => (
-                  <option value={option.id} key={option.id} className="px-4" >
-                    {option.name}
-                  </option>
-                )
-              )}
-            </select>
+                {...register("nationality_id", {
+                  required: "This field is required",
+                })}
+                className="ml-10  px-9 border-2  border-gray-300 rounded-lg "
+              >
+                {queryNationality?.data?.data?.map(
+                  (option: { name: string; id: string }) => (
+                    <option value={option.id} key={option.id} className="px-4">
+                      {option.name}
+                    </option>
+                  )
+                )}
+              </select>
 
-              
               <div className="flex flex-row  ml-[7%] ">
                 <div>
                   <BsPersonStanding className=" text-[#2C7FE0] mt-1" />
@@ -364,23 +365,20 @@ const Home = () => {
                   </div>
                 </div>
               </div>
-            <select
-              {...register("marital_status_id", {
-                required: "This field is required",
-              })}
-              className="ml-5 w-[12rem]"
-            >
-              {queryMaritailStatus?.data?.data?.map(
-                (option: { name: string; id: string }) => (
-                  <option value={option.id} key={option.id} className="px-4">
-                    {option.name}
-                  </option>
-                )
-              )}
-            </select>
-           
-
-
+              <select
+                {...register("marital_status_id", {
+                  required: "This field is required",
+                })}
+                className="ml-20  px-9 border-2  border-gray-300 rounded-lg "
+              >
+                {queryMaritailStatus?.data?.data?.map(
+                  (option: { name: string; id: string }) => (
+                    <option value={option.id} key={option.id} className="px-4">
+                      {option.name}
+                    </option>
+                  )
+                )}
+              </select>
             </div>
 
             <div className="flex flex-row mt-10 space-x-14">
@@ -409,7 +407,7 @@ const Home = () => {
                 <div className="flex flex-row  space-x-4 ml-3">
                   <div className="flex flex-col items-center ">
                     <div className="flex items-center justify-center w-full">
-                      {!selectedDocument?.name ? ( 
+                      {!selectedDocument?.name ? (
                         <label className="flex flex-col items-center justify-center w-full rounded-lg cursor-pointer bg-[#E5EDF5] hover:bg-gray-100 dark:border-gray-600 dark:hover:border-gray-500 dark:hover:bg-gray-600">
                           <div className="flex flex-col items-center justify-center pt-5 pb-6">
                             <svg
