@@ -1,13 +1,11 @@
 import type { PropsWithChildren } from "react";
-import { Breadcrumb } from "../breadcrumb";
-import { Menu } from "../menu";
+import MainHeader from "../Header";
 
 export const Layout: React.FC<PropsWithChildren> = ({ children }) => {
   return (
     <div className="layout">
-      <Menu />
+      <MainHeader />
       <div className="content">
-        <Breadcrumb />
         <div>{children}</div>
       </div>
     </div>
