@@ -9,6 +9,11 @@ import FileUpload from "../../components/File";
 import { addRefugeeRequest } from "../../util/service/refugee";
 import { useForm } from "react-hook-form";
 import { AiOutlineDelete, AiOutlineUpload } from "react-icons/ai";
+import { useSelect } from "@refinedev/core";
+import Loader from "../../components/loader";
+
+export const SELECT_QUERY = ["id", "name"]
+
 
 type FormInputs = {
   first_name: string;
@@ -42,6 +47,29 @@ const Home = () => {
   const [profileImage, setProfileImage] = useState(
     "https://pics.craiyon.com/2023-11-26/oMNPpACzTtO5OVERUZwh3Q.webp"
   );
+
+  const { query: queryNationality } = useSelect<{ id: string; name: string }>({
+    resource: "base_nationalities",
+    meta: {
+      fields: SELECT_QUERY,
+    },
+  });
+
+  const { query: queryGender } = useSelect<{ id: string; name: string }>({
+    resource: "base_genders",
+    meta: {
+      fields: SELECT_QUERY,
+    },
+  });
+
+  const { query: queryMaritailStatus } = useSelect<{ id: string; name: string }>({
+    resource: "base_marital_statuses",
+    meta: {
+      fields: SELECT_QUERY,
+    },
+  });
+
+
 
   // Handle the file upload and update the profile image
   const handleImageChange = (event: React.ChangeEvent<HTMLInputElement>) => {
@@ -152,7 +180,7 @@ const Home = () => {
                 </div>
               </div>
             </div>
-            <div className="relative w-36 h-36 ml-10">
+            <div className="relative w-[12rem] h-36 ml-10">
               {/* Profile Image */}
               <img
                 src={profileImage}
@@ -247,36 +275,29 @@ const Home = () => {
                     </div>
                     <div className="ml-3">Gender *</div>
                   </div>
-                  <div className="flex flex-row space-x-4 ml-28">
-                    <button
-                      type="button"
-                      onClick={() => handleButtonClick("male")}
-                      className={`${
-                        selected === "male"
-                          ? "text-blue-500 border-blue-500"
-                          : "border-gray-200 text-gray-800"
-                      } p-3 rounded-lg border-2 w-24 text-[12px] focus:outline-none`}
-                    >
-                      Male
-                    </button>
-                    <button
-                      type="button"
-                      onClick={() => handleButtonClick("female")}
-                      className={`${
-                        selected === "female"
-                          ? "text-blue-500 border-blue-500"
-                          : "border-gray-200 text-gray-800"
-                      } p-3 rounded-lg border-2 w-24 text-[12px] focus:outline-none`}
-                    >
-                      Female
-                    </button>
-                  </div>
 
+                  <select
+              {...register("gender_id", {
+                required: "This field is required",
+              })}
+              className="ml-5 w-36"
+            >
+              {queryGender?.data?.data?.map(
+                (option: { name: string; id: string }) => (
+                  <option value={option.id} key={option.id} className="px-4" >
+                    {option.name}
+                  </option>
+                )
+              )}
+            </select>
+
+            
+                 
                   {/* Date of Birth Section */}
                   <div className="flex flex-row items-center ml-16">
                     <div>
                       <IoCalendarOutline className="text-[#2C7FE0] mt-1" />
-                    </div>
+                    </div> 
                     <div className="flex flex-col ml-2">
                       <div className="text-[15px] font-bold text-gray-500">
                         Date of Birth *
@@ -313,19 +334,23 @@ const Home = () => {
                   </div>
                 </div>
               </div>
-              <div className="flex flex-col items-center ml-[10%]">
-                <input
-                  {...register("nationality_id", { required: true })}
-                  type="text"
-                  className="bg-gray-50 border border-gray-300 text-gray-900 text-sm rounded-lg focus:ring-blue-500 focus:border-blue-500 block w-full p-2.5 dark:placeholder-gray-400 dark:text-black dark:focus:ring-blue-500 dark:focus:border-blue-500"
-                  placeholder="Country"
-                />
-                {errors.nationality_id && (
-                  <span className="text-red-500 text-sm">
-                    This field is required
-                  </span>
-                )}
-              </div>
+
+              <select
+              {...register("nationality_id", {
+                required: "This field is required",
+              })}
+              className="ml-5 w-[12rem]"
+            >
+              {queryNationality?.data?.data?.map(
+                (option: { name: string; id: string }) => (
+                  <option value={option.id} key={option.id} className="px-4" >
+                    {option.name}
+                  </option>
+                )
+              )}
+            </select>
+
+              
               <div className="flex flex-row  ml-[7%] ">
                 <div>
                   <BsPersonStanding className=" text-[#2C7FE0] mt-1" />
@@ -339,19 +364,23 @@ const Home = () => {
                   </div>
                 </div>
               </div>
-              <div className="flex flex-col items-center ml-14">
-                <input
-                  {...register("marital_status_id", { required: true })}
-                  type="text"
-                  className="bg-gray-50 border border-gray-300 text-gray-900 text-sm rounded-lg focus:ring-blue-500 focus:border-blue-500 block w-full p-2.5 dark:placeholder-gray-400 dark:text-black dark:focus:ring-blue-500 dark:focus:border-blue-500"
-                  placeholder="Martial Status"
-                />
-                {errors.marital_status_id && (
-                  <span className="text-red-500 text-sm">
-                    This field is required
-                  </span>
-                )}
-              </div>
+            <select
+              {...register("marital_status_id", {
+                required: "This field is required",
+              })}
+              className="ml-5 w-[12rem]"
+            >
+              {queryMaritailStatus?.data?.data?.map(
+                (option: { name: string; id: string }) => (
+                  <option value={option.id} key={option.id} className="px-4">
+                    {option.name}
+                  </option>
+                )
+              )}
+            </select>
+           
+
+
             </div>
 
             <div className="flex flex-row mt-10 space-x-14">
@@ -380,7 +409,7 @@ const Home = () => {
                 <div className="flex flex-row  space-x-4 ml-3">
                   <div className="flex flex-col items-center ">
                     <div className="flex items-center justify-center w-full">
-                      {!selectedDocument?.name ? (
+                      {!selectedDocument?.name ? ( 
                         <label className="flex flex-col items-center justify-center w-full rounded-lg cursor-pointer bg-[#E5EDF5] hover:bg-gray-100 dark:border-gray-600 dark:hover:border-gray-500 dark:hover:bg-gray-600">
                           <div className="flex flex-col items-center justify-center pt-5 pb-6">
                             <svg
