@@ -15,6 +15,7 @@ import {
 import { useSelect } from "@refinedev/core";
 import { FormInputs } from "../../type/addrefugee";
 import { toast, ToastContainer } from "react-toastify";
+import { checkIsStringLetter } from "../../util/methods/form";
 
 export const SELECT_QUERY = ["id", "name"];
 
@@ -194,10 +195,7 @@ const Home = () => {
     reset,
     formState: { errors },
   } = useForm<FormInputs>();
-  console.log(getValues());
   const [child, setchild] = useState(false);
-  const [spouse, setspouse] = useState(false);
-  console.log(child, "child");
   const onSubmit = async (data: FormInputs) => {
     const project_image = [];
     setLoading(true);
@@ -458,6 +456,7 @@ const Home = () => {
                       id="first_name"
                       className="bg-gray-50 ml-12 border-gray-300 text-sm rounded-md focus:ring-blue-500 focus:border-blue-500 block p-2.5 dark:placeholder-gray-400 dark:text-black dark:focus:ring-blue-500 dark:focus:border-blue-500"
                       placeholder="First Name"
+                      onKeyDown={e => checkIsStringLetter(e)}
                     />
                   </div>
                   <div>
@@ -467,6 +466,7 @@ const Home = () => {
                       id="middle_name"
                       className="bg-gray-50 ml-10 border-gray-300 text-sm rounded-md focus:ring-blue-500 focus:border-blue-500 block p-2.5 dark:placeholder-gray-400 dark:text-black dark:focus:ring-blue-500 dark:focus:border-blue-500"
                       placeholder="Middle Name"
+                      onKeyDown={e => checkIsStringLetter(e)}
                     />
                   </div>
                   <div>
@@ -476,7 +476,14 @@ const Home = () => {
                       id="last_name"
                       className="bg-gray-50 ml-10 border-gray-300 text-sm rounded-md focus:ring-blue-500 focus:border-blue-500 block p-2.5 dark:placeholder-gray-400 dark:text-black dark:focus:ring-blue-500 dark:focus:border-blue-500"
                       placeholder="Last Name"
+                      onKeyDown={e => checkIsStringLetter(e)}
+                      required
                     />
+                    {errors.last_name && (
+                      <span className="text-red-500">
+                        This field is required
+                      </span>
+                    )}
                   </div>
                 </div>
               </div>
@@ -989,6 +996,7 @@ const Home = () => {
                       })}
                       className="bg-gray-50 border border-gray-300 text-gray-900 text-sm rounded-lg focus:ring-blue-500 focus:border-blue-500 block w-full p-2.5"
                       placeholder="Year"
+                      onKeyDown={e => checkIsStringLetter(e)}
                     />
                     {errors.spouse_or_child_name && (
                       <span className="text-red-500">
@@ -1020,6 +1028,7 @@ const Home = () => {
                       {...register("institute_name", { required: true })}
                       className="bg-gray-50 border border-gray-300 text-gray-900 text-sm rounded-lg focus:ring-blue-500 focus:border-blue-500 block w-full p-2.5"
                       placeholder="Institute"
+                      onKeyDown={e => checkIsStringLetter(e)}
                     />
                     {errors.institute_name && (
                       <span className="text-red-500">
@@ -1043,6 +1052,7 @@ const Home = () => {
                       {...register("field_of_study", { required: true })}
                       className="bg-gray-50 border border-gray-300 text-gray-900 text-sm rounded-lg focus:ring-blue-500 focus:border-blue-500 block w-full p-2.5"
                       placeholder="Field"
+                      onKeyDown={e => checkIsStringLetter(e)}
                     />
                     {errors.field_of_study && (
                       <span className="text-red-500">
@@ -1199,7 +1209,7 @@ const Home = () => {
                   <div className="flex flex-row">
                     <MdDashboard className="text-[#2C7FE0] mt-1" />
                     <div className="ml-3 flex flex-col">
-                      <div>date received *</div>
+                      <div>Date Received *</div>
                     </div>
                   </div>
                   <div className="relative max-w-sm ml-3">
@@ -1239,6 +1249,7 @@ const Home = () => {
                         type="text"
                         className="bg-gray-50 border ml-[54%] border-gray-300 text-gray-900 text-sm rounded-lg focus:ring-blue-500 focus:border-blue-500 block p-2.5 dark:placeholder-gray-400 dark:text-black dark:focus:ring-blue-500 dark:focus:border-blue-500"
                         placeholder="Skill"
+                      onKeyDown={e => checkIsStringLetter(e)}
                       />
                       {errors.professional_skill && (
                         <span className="text-red-500">
@@ -1264,6 +1275,7 @@ const Home = () => {
                       type="text"
                       className="bg-gray-50 border ml-11 border-gray-300 text-gray-900 text-sm rounded-lg focus:ring-blue-500 focus:border-blue-500 block p-2.5 dark:placeholder-gray-400 dark:text-black dark:focus:ring-blue-500 dark:focus:border-blue-500"
                       placeholder="Job Title"
+                      onKeyDown={e => checkIsStringLetter(e)}
                     />
                     {errors.preferred_job_title && (
                       <span className="text-red-500">
@@ -1372,7 +1384,9 @@ const Home = () => {
               >
                 Cancel
               </div>
-              <button className="flex items-center justify-center w-56  bg-[#2C7DD6] text-white py-2 px-4 rounded-md">
+              <button
+              onClick={() => console.log("=====>",errors)}
+              className="flex items-center justify-center w-56  bg-[#2C7DD6] text-white py-2 px-4 rounded-md">
                 {loading ? (
                   <AiOutlineLoading3Quarters className="animate-spin mr-2 text-white" />
                 ) : (
