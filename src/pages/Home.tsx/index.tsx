@@ -5,7 +5,6 @@ import { BsPersonStandingDress } from "react-icons/bs";
 import { useState } from "react";
 import { IoCalendarOutline } from "react-icons/io5";
 import { FaPhone } from "react-icons/fa";
-import FileUpload from "../../components/File";
 import { addRefugeeRequest, uploadFiles } from "../../util/service/refugee";
 import { useForm } from "react-hook-form";
 import {
@@ -14,7 +13,6 @@ import {
   AiOutlineUpload,
 } from "react-icons/ai";
 import { useSelect } from "@refinedev/core";
-import Loader from "../../components/loader";
 import { FormInputs } from "../../type/addrefugee";
 import { toast, ToastContainer } from "react-toastify";
 
@@ -387,7 +385,7 @@ const Home = () => {
         className="w-full flex justify-center items-center mt-8"
       >
         <div className="flex w-full justify-center  bg-gray-100">
-          <div className="bg-white py-6 px-8  shadow-lg shadow-gray-400/50 rounded-xl w-full max-w-[1500px]">
+          <div className="bg-white py-6 px-8  shadow-lg shadow-gray-400/50 rounded-xl w-full max-w-[1200px]">
             <h2 className="text-xl font-bold mb-1 text-[#2C7DD6]">
               Refugee Registeration
             </h2>
@@ -501,12 +499,12 @@ const Home = () => {
                         <div className="ml-3">Gender *</div>
                       </div>
 
-                      <div className=" w-1/2 flex justify-center">
+                      <div className=" w-1/2 flex items-start justify-center">
                         <select
                           {...register("gender_id", {
                             required: true,
                           })}
-                          className="ml-8  w-[12rem] px-4 bg-gray-100 justify-self-center rounded-lg "
+                          className="ml-8  px-4 pt-2 pb-3 w-[12rem] bg-gray-100 justify-self-center rounded-lg "
                         >
                           {queryGender?.data?.data?.map(
                             (option: { name: string; id: string }) => (
@@ -564,12 +562,12 @@ const Home = () => {
                       </div>
                     </div>
                   </div>
-                  <div className=" w-1/2 flex justify-center">
+                  <div className=" w-1/2 flex items-start justify-center">
                     <select
                       {...register("nationality_id", {
                         required: true,
                       })}
-                      className="w-[12rem] px-4 bg-gray-100 justify-self-center rounded-lg "
+                      className="w-[12rem] px-4 pt-2 pb-3 bg-gray-100 justify-self-center rounded-lg "
                     >
                       {queryNationality?.data?.data?.map(
                         (option: { name: string; id: string }) => (
@@ -602,12 +600,12 @@ const Home = () => {
                     </div>
                   </div>
                 </div>
-                <div className="flex justify-center ">
+                <div className="flex items-start justify-center ">
                   <select
                     {...register("marital_status_id", {
                       required: true,
                     })}
-                    className="w-[14rem] px-4 bg-gray-100 justify-self-center rounded-lg "
+                    className="w-[14rem] px-4 pt-2 pb-3 bg-gray-100 justify-self-center rounded-lg "
                   >
                     {queryMaritailStatus?.data?.data?.map(
                       (option: { name: string; id: string }) => (
@@ -933,7 +931,7 @@ const Home = () => {
                   {...register("is_spouse_or_child_citizen_et", {
                     required: "This field is required",
                   })}
-                  className="ml-14  w-[12rem]   px-4 bg-gray-100  rounded-lg "
+                  className="ml-14  w-[12rem] px-4 pt-2 pb-3  px-4 bg-gray-100  rounded-lg "
                 >
                   <option
                     value="true"
@@ -964,7 +962,7 @@ const Home = () => {
                       {...register("is_spouse", {
                         required: "This field is required",
                       })}
-                      className="ml-8 w-46 w-[12rem] px-4 py-2 bg-gray-100 justify-self-center rounded-lg "
+                      className="ml-8 w-46 w-[12rem] px-4 pt-2 pb-3 bg-gray-100 justify-self-center rounded-lg "
                     >
                       <option value="false" className="px-4">
                         child citizen
