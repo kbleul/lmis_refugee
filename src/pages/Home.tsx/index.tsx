@@ -24,6 +24,7 @@ const Home = () => {
   const [selectedDocument, setSelectedDocument] = useState<any>(null);
   const [selectedServiceDocument, setSelectedServiceDocument] =
     useState<any>(null);
+  const [profileimage, setprofileimage] = useState<any>(null);
   const [loading, setLoading] = useState(false);
   const [selectedEducationDocument, setSelectedEducationDocument] =
     useState<any>(null);
@@ -56,16 +57,29 @@ const Home = () => {
       fields: SELECT_QUERY,
     },
   });
-
-  // Handle the file upload and update the profile image
   const handleImageChange = (event: React.ChangeEvent<HTMLInputElement>) => {
-    const file = event.target.files?.[0];
-    console.log(file, "filefile");
+    const file = event.target.files ? event.target.files[0] : null;
     if (file) {
+      // Create a FileReader to read the file as base64
+      const reader = new FileReader();
+
       const imageUrl = URL.createObjectURL(file); // Preview the selected image
       setProfileImage(imageUrl); // Set the new profile image
+
+      // When the file is successfully read
+      reader.onloadend = () => {
+        const base64String = reader.result as string; // This will be the base64 string
+        setprofileimage({
+          file: file,
+          base64: base64String, // Store the base64 string in state
+        });
+      };
+
+      // Read the file as a Data URL (base64)
+      reader.readAsDataURL(file);
     }
   };
+  // Handle the file upload and update the profile image
 
   const handleCurriculumFileChange = (
     event: React.ChangeEvent<HTMLInputElement>
@@ -189,6 +203,26 @@ const Home = () => {
   const onSubmit = async (data: FormInputs) => {
     const project_image = [];
     setLoading(true);
+    if (profileimage?.file?.name) {
+      const uploadedFile: any = await uploadFiles({
+        file: profileimage.base64,
+        extension: profileimage.file.type,
+        FolderId: "Profile Picture",
+      });
+      const projectImageObject = {
+        document_type_id: "69937b8f-7c44-49ed-9d24-71ad523dc6c8",
+        title: "Profile Picture",
+        properties: JSON.stringify({
+          name: profileimage?.file,
+          path: uploadedFile?.responce?.uploadFile?.info?.Key,
+          title: "Profile Picture",
+          category: "d08e89f1-a368-4d02-931d-9f611dba9cd2",
+        }),
+        files: uploadedFile?.responce?.uploadFile?.info?.Key,
+      };
+
+      project_image.push(projectImageObject);
+    }
     if (selectedDocument?.file?.name) {
       console.log(selectedDocument);
       const uploadedFile: any = await uploadFiles({
@@ -323,6 +357,10 @@ const Home = () => {
       setSelectedDocument(null);
       setSelectedCurriculumDocument(null);
       setSelectedEducationDocument(null);
+      setProfileImage(
+        "https://img.freepik.com/premium-vector/user-profile-icon-flat-style-member-avatar-vector-illustration-isolated-background-human-permission-sign-business-concept_157943-15752.jpg"
+      );
+      setprofileimage(null);
     } catch (error) {
       toast.error("Failed to submit the form.");
       setLoading(false);
@@ -335,6 +373,10 @@ const Home = () => {
     setSelectedDocument(null);
     setSelectedCurriculumDocument(null);
     setSelectedEducationDocument(null);
+    setProfileImage(
+      "https://img.freepik.com/premium-vector/user-profile-icon-flat-style-member-avatar-vector-illustration-isolated-background-human-permission-sign-business-concept_157943-15752.jpg"
+    );
+    setprofileimage(null);
   };
 
   return (
@@ -383,6 +425,7 @@ const Home = () => {
                   accept="image/*"
                   className="hidden"
                   id="imageUpload"
+                  required
                   onChange={handleImageChange} // Call function on file selection
                 />
                 <label
@@ -897,14 +940,14 @@ const Home = () => {
                     className="px-4"
                     onClick={() => setchild(true)}
                   >
-                    spouse
+                    True
                   </option>
                   <option
                     value="false"
                     className="px-4"
                     onClick={() => setchild(false)}
                   >
-                    child
+                    False
                   </option>
                 </select>
               </div>
@@ -923,10 +966,10 @@ const Home = () => {
                       })}
                       className="ml-8 w-46 w-[12rem] px-4 py-2 bg-gray-100 justify-self-center rounded-lg "
                     >
-                      <option value="true" className="px-4">
+                      <option value="false" className="px-4">
                         child citizen
                       </option>
-                      <option value="false" className="px-4">
+                      <option value="true" className="px-4">
                         is spouse
                       </option>
                     </select>
