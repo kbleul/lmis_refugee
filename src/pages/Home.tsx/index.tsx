@@ -194,7 +194,12 @@ const Home = () => {
       const projectImageObject = {
         document_type_id: "65dc2ac2-a20c-4a9f-a1f9-a0da8fc4c771",
         title: "Proof of Ethiopian Spouse or Child",
-        // properties: { ...selectedDocument.file.files },
+        properties: JSON.stringify({
+          name: selectedDocument.file,
+          path: uploadedFile?.responce?.uploadFile?.info?.Key,
+          title: "Proof of Ethiopian Spouse or Child",
+          category: "d08e89f1-a368-4d02-931d-9f611dba9cd2",
+        }),
         files: uploadedFile?.responce?.uploadFile?.info?.Key,
       };
 
@@ -209,7 +214,12 @@ const Home = () => {
       const projectImageObject = {
         document_type_id: "8e2f0892-9360-4c43-9816-e272854ec626",
         title: "Service-Issued ID",
-        // properties: `${selectedServiceDocument.file}`,
+        properties: JSON.stringify({
+          name: selectedDocument.file,
+          path: uploadedFile?.responce?.uploadFile?.info?.Key,
+          title: "Service-Issued ID",
+          category: "d08e89f1-a368-4d02-931d-9f611dba9cd2",
+        }),
         files: uploadedFile?.responce?.uploadFile?.info?.Key,
       };
 
@@ -225,7 +235,12 @@ const Home = () => {
       const projectImageObject = {
         document_type_id: "e302dd40-8fd9-423d-a24f-096f5916729b",
         title: "Educational certificate and Work experience of refugee",
-        // properties: `${selectedEducationDocument.file}`,
+        properties: JSON.stringify({
+          name: selectedDocument.file,
+          path: uploadedFile?.responce?.uploadFile?.info?.Key,
+          title: "Educational certificate and Work experience of refugee",
+          category: "d08e89f1-a368-4d02-931d-9f611dba9cd2",
+        }),
         files: uploadedFile?.responce?.uploadFile?.info?.Key,
       };
 
@@ -241,7 +256,12 @@ const Home = () => {
       const projectImageObject = {
         document_type_id: "228d72d1-b34b-4a99-94a9-464fe009f881",
         title: "CV",
-        // properties: `${selectedCurriculumDocument.file}`,
+        properties: JSON.stringify({
+          name: selectedDocument.file,
+          path: uploadedFile?.responce?.uploadFile?.info?.Key,
+          title: "CV",
+          category: "d08e89f1-a368-4d02-931d-9f611dba9cd2",
+        }),
         files: uploadedFile?.responce?.uploadFile?.info?.Key,
       };
 
@@ -282,8 +302,8 @@ const Home = () => {
       },
       spouse_child_citizenships: [
         {
-          is_child_citizen: stringToBoolean(data?.is_child_citizen),
-          is_spouse: stringToBoolean(data?.is_spouse),
+          is_child_citizen: !stringToBoolean(data?.is_spouse) ? true : false,
+          is_spouse: stringToBoolean(data?.is_spouse) ? true : false,
           spouse_or_child_name: data?.spouse_or_child_name,
         },
       ],
@@ -359,7 +379,7 @@ const Home = () => {
                     Refugee Name <span className="text-red">*</span>
                   </div>
                   <div className="text-[12px] text-gray-300">
-                    Enter Applicant’s Full Name
+                    Enter Applicant’s Full Name *
                   </div>
                 </div>
               </div>
@@ -418,7 +438,7 @@ const Home = () => {
 
                   <select
                     {...register("gender_id", {
-                      required: "This field is required",
+                      required: true,
                     })}
                     className="ml-8 w-46 px-16 border-2  border-gray-300 rounded-lg "
                   >
@@ -444,7 +464,7 @@ const Home = () => {
                         Date of Birth *
                       </div>
                       <div className="text-[12px] text-gray-300">
-                        Enter Applicant’s Birth Date
+                        Enter Applicant’s Birth Date *
                       </div>
                     </div>
                   </div>
@@ -454,7 +474,7 @@ const Home = () => {
                       datepicker-format="mm-dd-yyyy"
                       type="date"
                       {...register("date_of_birth", {
-                        required: "Date of Birth is required",
+                        required: true,
                       })}
                       className=" w-46 px-6   bg-gray-50 border border-gray-300 text-gray-900 text-sm rounded-lg focus:ring-blue-500 focus:border-blue-500 block w-full p-2.5 dark:placeholder-gray-400 dark:focus:ring-blue-500 dark:focus:border-blue-500"
                       placeholder="Select date"
@@ -471,14 +491,14 @@ const Home = () => {
                 <div className="flex flex-col ml-2">
                   <div className="ml-3">Nationality*</div>
                   <div className="text-gray-300 text-[12px]">
-                    Country of Birth
+                    Country of Birth *
                   </div>
                 </div>
               </div>
 
               <select
                 {...register("nationality_id", {
-                  required: "This field is required",
+                  required: true,
                 })}
                 className="ml-10  px-9 border-2  border-gray-300 rounded-lg "
               >
@@ -506,7 +526,7 @@ const Home = () => {
               </div>
               <select
                 {...register("marital_status_id", {
-                  required: "This field is required",
+                  required: true,
                 })}
                 className="ml-20  px-9 border-2  border-gray-300 rounded-lg "
               >
@@ -524,7 +544,7 @@ const Home = () => {
               <div className="flex flex-row">
                 <MdDashboard className="text-[#2C7FE0] mt-1" />
                 <div className="ml-3">
-                  <div>start_date</div>
+                  <div>start_date *</div>
                 </div>
                 <div className="flex flex-row  space-x-4 ml-3">
                   <div className="flex flex-col items-center ">
@@ -551,7 +571,7 @@ const Home = () => {
                 <div className="flex flex-row items-center">
                   <MdDashboard className="text-[#2C7FE0] mt-1" />
                   <div className="ml-3">
-                    <div>service issued number</div>
+                    <div>service issued number *</div>
                   </div>
                 </div>
                 <div className="flex flex-row  space-x-4 ml-3">
@@ -707,6 +727,7 @@ const Home = () => {
                         type="file"
                         name="preferred_job_title" // This will be used to map the file to a form field
                         className="hidden"
+                        required
                         onChange={handleServiceFileChange} // Handle file selection
                       />
                     </label>
@@ -746,7 +767,7 @@ const Home = () => {
               <div className="flex flex-row items-center">
                 <MdDashboard className="text-[#2C7FE0] mt-1" />
                 <div className="ml-3">
-                  <div>service issued</div>
+                  <div>service issued *</div>
                 </div>
               </div>
               <div className="flex flex-row  space-x-4 ml-3">
@@ -768,7 +789,7 @@ const Home = () => {
                 <MdDashboard className="text-[#2C7FE0] mt-1" />
                 <div className="ml-3">
                   <div>
-                    service issued_id <br />
+                    service issued id * <br />
                     date of expiry
                   </div>
                 </div>
@@ -793,7 +814,7 @@ const Home = () => {
               <div className="flex flex-row items-center">
                 <MdDashboard className="text-[#2C7FE0] mt-1" />
                 <div className="ml-3">
-                  <div>duration requested years</div>
+                  <div>duration requested years *</div>
                 </div>
               </div>
               <div className="flex flex-row  space-x-4 ml-3">
@@ -811,7 +832,7 @@ const Home = () => {
               <div className="flex flex-row items-center">
                 <MdDashboard className="text-[#2C7FE0] mt-1" />
                 <div className="ml-3">
-                  <div>is spouse/child citizen</div>
+                  <div>is spouse/child citizen *</div>
                 </div>
               </div>
               <div className="flex flex-row  space-x-4 ml-3">
@@ -826,44 +847,23 @@ const Home = () => {
                     className="px-4"
                     onClick={() => setchild(true)}
                   >
-                    True
+                    spouse
                   </option>
                   <option
                     value="false"
                     className="px-4"
                     onClick={() => setchild(false)}
                   >
-                    False
+                    child
                   </option>
                 </select>
               </div>
             </div>
             <div className="flex flex-row items-center  mt-10">
-              <div className="flex flex-row items-center">
-                <MdDashboard className="text-[#2C7FE0] mt-1" />
-                <div className="ml-3">
-                  <div>is child citizen</div>
-                </div>
-              </div>
-              <div className="flex flex-row  space-x-4 ml-3">
-                <select
-                  {...register("is_child_citizen", {
-                    required: "This field is required",
-                  })}
-                  className="ml-8 w-46 px-16 border-2 p-3  border-gray-300 rounded-lg "
-                >
-                  <option value="true" className="px-4">
-                    True
-                  </option>
-                  <option value="false" className="px-4">
-                    False
-                  </option>
-                </select>
-              </div>
               <div className="flex flex-row items-center ml-10">
                 <MdDashboard className="text-[#2C7FE0] mt-1" />
                 <div className="ml-3">
-                  <div>is spouse</div>
+                  <div>is child/spouse citizen *</div>
                 </div>
               </div>
               <div className="flex flex-row  space-x-4 ml-3">
@@ -874,10 +874,10 @@ const Home = () => {
                   className="ml-8 w-46 px-16 border-2 p-3  border-gray-300 rounded-lg "
                 >
                   <option value="true" className="px-4">
-                    True
+                    child citizen
                   </option>
                   <option value="false" className="px-4">
-                    False
+                    is spouse
                   </option>
                 </select>
               </div>
@@ -887,7 +887,7 @@ const Home = () => {
               <div className="flex flex-row items-center ml-10">
                 <MdDashboard className="text-[#2C7FE0] mt-1" />
                 <div className="ml-3">
-                  <div>spouse/child_name</div>
+                  <div>spouse/child_name *</div>
                 </div>
               </div>
               <div className="flex flex-row  space-x-4 ml-3">
@@ -916,7 +916,7 @@ const Home = () => {
               <div className="flex flex-row">
                 <MdDashboard className="text-[#2C7FE0] mt-1" />
                 <div className="flex flex-col ml-2">
-                  <div className="ml-3">Institute Name</div>
+                  <div className="ml-3">Institute Name *</div>
                 </div>
               </div>
               <div className="flex flex-col items-center ml-32">
@@ -937,7 +937,7 @@ const Home = () => {
                 <MdDashboard className="text-[#2C7FE0] mt-1" />
                 <div className="flex flex-col">
                   <div className="text-[15px] font-bold text-gray-500 ml-2">
-                    Field of Study
+                    Field of Study *
                   </div>
                 </div>
               </div>
@@ -960,7 +960,7 @@ const Home = () => {
               <div className="flex flex-row">
                 <MdDashboard className="text-[#2C7FE0] mt-1" />
                 <div className="flex flex-col ml-2">
-                  <div className="ml-3">Highest Education Level</div>
+                  <div className="ml-3">Highest Education Level *</div>
                 </div>
               </div>
               <div className="flex flex-col items-center ml-14">
@@ -984,7 +984,7 @@ const Home = () => {
                     Year Completed
                   </div>
                   <div className="font-[12px] text-gray-300">
-                    Enter Applicant’s
+                    Enter Applicant’s *
                     <br /> Year comp.
                   </div>
                 </div>
@@ -1049,6 +1049,7 @@ const Home = () => {
                     type="file"
                     name="preferred_job_title" // This will be used to map the file to a form field
                     className="hidden"
+                    required
                     onChange={handleEducationFileChange} // Handle file selection
                   />
                 </label>
@@ -1084,7 +1085,7 @@ const Home = () => {
               <div className="flex flex-row">
                 <MdDashboard className="text-[#2C7FE0] mt-1" />
                 <div className="ml-3 flex flex-col">
-                  <div>date received</div>
+                  <div>date received *</div>
                 </div>
               </div>
               <div className="relative max-w-sm ml-3">
@@ -1093,7 +1094,7 @@ const Home = () => {
                   datepicker-format="mm-dd-yyyy"
                   type="date"
                   {...register("date_received", {
-                    required: "Date  is required",
+                    required: true,
                   })}
                   className=" w-46 px-6   bg-gray-50 border border-gray-300 text-gray-900 text-sm rounded-lg focus:ring-blue-500 focus:border-blue-500 block w-full p-2.5 dark:placeholder-gray-400 dark:focus:ring-blue-500 dark:focus:border-blue-500"
                   placeholder="Select date"
@@ -1118,9 +1119,7 @@ const Home = () => {
                 </div>
                 <div className="flex flex-col items-center">
                   <input
-                    {...register("professional_skill", {
-                      required: "Professional skill is required",
-                    })}
+                    {...register("professional_skill")}
                     type="text"
                     className="bg-gray-50 border ml-[54%] border-gray-300 text-gray-900 text-sm rounded-lg focus:ring-blue-500 focus:border-blue-500 block p-2.5 dark:placeholder-gray-400 dark:text-black dark:focus:ring-blue-500 dark:focus:border-blue-500"
                     placeholder="Skill"
@@ -1144,9 +1143,7 @@ const Home = () => {
                 </div>
                 <div className="flex flex-col items-center">
                   <input
-                    {...register("preferred_job_title", {
-                      required: "Preferred job title is required",
-                    })}
+                    {...register("preferred_job_title")}
                     type="text"
                     className="bg-gray-50 border ml-11 border-gray-300 text-gray-900 text-sm rounded-lg focus:ring-blue-500 focus:border-blue-500 block p-2.5 dark:placeholder-gray-400 dark:text-black dark:focus:ring-blue-500 dark:focus:border-blue-500"
                     placeholder="Job Title"
