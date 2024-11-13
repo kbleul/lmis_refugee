@@ -17,7 +17,6 @@ import { toast, ToastContainer } from "react-toastify";
 export const SELECT_QUERY = ["id", "name"];
 
 const Home = () => {
-  const [selected, setSelected] = useState(null);
   const [selectedDocument, setSelectedDocument] = useState<any>(null);
   const [selectedServiceDocument, setSelectedServiceDocument] =
     useState<any>(null);
