@@ -4,6 +4,7 @@
   "private": true,
   "type": "module",
   "dependencies": {
+    "@apollo/client": "^3.8.10",
     "@refinedev/cli": "^2.16.21",
     "@refinedev/core": "^4.47.1",
     "@refinedev/devtools": "^1.1.32",
@@ -14,18 +15,17 @@
     "@refinedev/react-table": "^5.6.6",
     "@tanstack/react-table": "^8.2.6",
     "@types/js-cookie": "^3.0.6",
+    "apollo": "^2.34.0",
     "graphql": "^15.6.1",
     "graphql-request": "^5.2.0",
     "graphql-tag": "^2.12.6",
-
-    "next": "^14.2.17",
-
     "js-cookie": "^3.0.5",
-
+    "next": "^14.2.17",
     "react": "^18.0.0",
     "react-dom": "^18.0.0",
     "react-hook-form": "^7.53.2",
     "react-icons": "^5.3.0",
+    "react-promise-tracker": "^2.1.1",
     "react-router-dom": "^6.8.1",
     "react-spinners": "^0.14.1",
     "react-toastify": "^10.0.6",

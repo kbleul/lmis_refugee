@@ -18,7 +18,11 @@ export const addRefugeeRequest = async ({
   professional_skill,
   is_spouse_or_child_citizen_et,
   preferred_job_title,
-  created_by,
+  middle_name,
+  educations,
+  documents,
+  skills,
+  spouse_child_citizenships,
 }: any) => {
   try {
     await getClient(false).request(AddRefugeeMutation, {
@@ -38,7 +42,11 @@ export const addRefugeeRequest = async ({
       professional_skill,
       is_spouse_or_child_citizen_et,
       preferred_job_title,
-      created_by,
+      middle_name,
+      educations,
+      documents,
+      skills,
+      spouse_child_citizenships,
     });
 
     return { success: "success" };
@@ -47,15 +55,15 @@ export const addRefugeeRequest = async ({
   }
 };
 
-export const useFileUpload = async ({ extension, file, folder_id }: any) => {
+export const uploadFiles = async ({ extension, file, FolderId }: any) => {
   try {
-    await getClient(false).request(UPLOAD_FILE, {
+    const responce = await getClient(false).request(UPLOAD_FILE, {
       extension,
       file,
-      folder_id,
+      FolderId,
     });
 
-    return { success: "success" };
+    return { success: "success", responce: responce };
   } catch (error: any) {
     return { error: error?.message };
   }

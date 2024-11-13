@@ -6,33 +6,15 @@ import { useState } from "react";
 import { IoCalendarOutline } from "react-icons/io5";
 import { FaPhone } from "react-icons/fa";
 import FileUpload from "../../components/File";
-import { addRefugeeRequest } from "../../util/service/refugee";
+import { addRefugeeRequest, uploadFiles } from "../../util/service/refugee";
 import { useForm } from "react-hook-form";
 import { AiOutlineDelete, AiOutlineUpload } from "react-icons/ai";
 import { useSelect } from "@refinedev/core";
 import Loader from "../../components/loader";
+import { FormInputs } from "../../type/addrefugee";
 
 export const SELECT_QUERY = ["id", "name"];
 
-type FormInputs = {
-  first_name: string;
-  last_name: string;
-  gender_id: string;
-  date_of_birth: string; // You can use Date if the string will be converted to a Date object
-  nationality_id: string;
-  marital_status_id: string;
-  service_issued_id_number: string;
-  service_issued_id_date_of_issue: string;
-  service_issued_id_date_of_expiry: string;
-  start_date: string;
-  duration_requested_years: number;
-  highest_level_of_education: string;
-  year_completed: string;
-  professional_skill: string;
-  is_spouse_or_child_citizen_et: boolean;
-  preferred_job_title: string;
-  created_by: string;
-};
 const Home = () => {
   const [selected, setSelected] = useState(null);
   const [selectedDocument, setSelectedDocument] = useState<any>(null);
@@ -86,7 +68,20 @@ const Home = () => {
   ) => {
     const file = event.target.files ? event.target.files[0] : null;
     if (file) {
-      setSelectedCurriculumDocument(file); // Set selected document name
+      // Create a FileReader to read the file as base64
+      const reader = new FileReader();
+
+      // When the file is successfully read
+      reader.onloadend = () => {
+        const base64String = reader.result as string; // This will be the base64 string
+        setSelectedCurriculumDocument({
+          file: file,
+          base64: base64String, // Store the base64 string in state
+        });
+      };
+
+      // Read the file as a Data URL (base64)
+      reader.readAsDataURL(file);
     }
   };
 
@@ -100,10 +95,22 @@ const Home = () => {
   ) => {
     const file = event.target.files ? event.target.files[0] : null;
     if (file) {
-      setSelectedEducationDocument(file); // Set selected document name
+      // Create a FileReader to read the file as base64
+      const reader = new FileReader();
+
+      // When the file is successfully read
+      reader.onloadend = () => {
+        const base64String = reader.result as string; // This will be the base64 string
+        setSelectedEducationDocument({
+          file: file,
+          base64: base64String, // Store the base64 string in state
+        });
+      };
+
+      // Read the file as a Data URL (base64)
+      reader.readAsDataURL(file);
     }
   };
-
   // Handle remove document
   const handleRemoveEducationDocument = () => {
     setSelectedEducationDocument(null); // Remove selected document
@@ -112,7 +119,20 @@ const Home = () => {
   const handleFileChange = (event: React.ChangeEvent<HTMLInputElement>) => {
     const file = event.target.files ? event.target.files[0] : null;
     if (file) {
-      setSelectedDocument(file); // Set selected document name
+      // Create a FileReader to read the file as base64
+      const reader = new FileReader();
+
+      // When the file is successfully read
+      reader.onloadend = () => {
+        const base64String = reader.result as string; // This will be the base64 string
+        setSelectedDocument({
+          file: file,
+          base64: base64String, // Store the base64 string in state
+        });
+      };
+
+      // Read the file as a Data URL (base64)
+      reader.readAsDataURL(file);
     }
   };
 
@@ -120,31 +140,156 @@ const Home = () => {
   const handleRemoveServiceDocument = () => {
     setSelectedServiceDocument(null); // Remove selected document
   };
+
   const handleServiceFileChange = (
     event: React.ChangeEvent<HTMLInputElement>
   ) => {
     const file = event.target.files ? event.target.files[0] : null;
     if (file) {
-      setSelectedServiceDocument(file); // Set selected document name
+      // Create a FileReader to read the file as base64
+      const reader = new FileReader();
+
+      // When the file is successfully read
+      reader.onloadend = () => {
+        const base64String = reader.result as string; // This will be the base64 string
+        setSelectedServiceDocument({
+          file: file,
+          base64: base64String, // Store the base64 string in state
+        });
+      };
+
+      // Read the file as a Data URL (base64)
+      reader.readAsDataURL(file);
     }
   };
-
   // Handle remove document
+  const stringToBoolean = (str: any) => {
+    if (str === "true") return true;
+    if (str === "false") return false;
+    return Boolean(str); // Convert other string values to boolean
+  };
   const handleRemoveDocument = () => {
     setSelectedDocument(null); // Remove selected document
   };
   const {
     register,
     handleSubmit,
-    setValue,
+    getValues,
     formState: { errors },
   } = useForm<FormInputs>();
-
-  const handleButtonClick = (buttonId: any) => {
-    setSelected(selected === buttonId ? null : buttonId);
-  };
+  console.log(getValues());
+  const [child, setchild] = useState(false);
+  const [spouse, setspouse] = useState(false);
+  console.log(child, "child");
   const onSubmit = async (data: FormInputs) => {
-    // addRefugeeRequest({ ...data });
+    const project_image = [];
+
+    if (selectedDocument?.file?.name) {
+      console.log(selectedDocument);
+      const uploadedFile: any = await uploadFiles({
+        file: selectedDocument.base64,
+        extension: selectedDocument.file.type,
+        FolderId: "Proof of Ethiopian Spouse or Child",
+      });
+      const projectImageObject = {
+        document_type_id: "65dc2ac2-a20c-4a9f-a1f9-a0da8fc4c771",
+        title: "Proof of Ethiopian Spouse or Child",
+        // properties: { ...selectedDocument.file.files },
+        files: uploadedFile?.responce?.uploadFile?.info?.Key,
+      };
+
+      project_image.push(projectImageObject);
+    }
+    if (selectedServiceDocument?.file?.name) {
+      const uploadedFile: any = await uploadFiles({
+        file: selectedServiceDocument.base64,
+        extension: selectedServiceDocument.file.type,
+        FolderId: "Service-Issued ID",
+      });
+      const projectImageObject = {
+        document_type_id: "8e2f0892-9360-4c43-9816-e272854ec626",
+        title: "Service-Issued ID",
+        // properties: `${selectedServiceDocument.file}`,
+        files: uploadedFile?.responce?.uploadFile?.info?.Key,
+      };
+
+      project_image.push(projectImageObject);
+    }
+
+    if (selectedEducationDocument?.file?.name) {
+      const uploadedFile: any = await uploadFiles({
+        file: selectedEducationDocument.base64,
+        extension: selectedEducationDocument.file.type,
+        FolderId: "Educational certificate and Work experience of refugee",
+      });
+      const projectImageObject = {
+        document_type_id: "e302dd40-8fd9-423d-a24f-096f5916729b",
+        title: "Educational certificate and Work experience of refugee",
+        // properties: `${selectedEducationDocument.file}`,
+        files: uploadedFile?.responce?.uploadFile?.info?.Key,
+      };
+
+      project_image.push(projectImageObject);
+    }
+
+    if (selectedCurriculumDocument?.file?.name) {
+      const uploadedFile: any = await uploadFiles({
+        file: selectedCurriculumDocument.base64,
+        extension: selectedCurriculumDocument.file.type,
+        FolderId: "CV",
+      });
+      const projectImageObject = {
+        document_type_id: "228d72d1-b34b-4a99-94a9-464fe009f881",
+        title: "CV",
+        // properties: `${selectedCurriculumDocument.file}`,
+        files: uploadedFile?.responce?.uploadFile?.info?.Key,
+      };
+
+      project_image.push(projectImageObject);
+    }
+    console.log(JSON.stringify(selectedCurriculumDocument.file), "+");
+    const fieldData = {
+      first_name: data?.first_name,
+      last_name: data?.last_name,
+      gender_id: data?.gender_id,
+      date_of_birth: data?.date_of_birth,
+      nationality_id: data?.nationality_id,
+      marital_status_id: data?.marital_status_id,
+      service_issued_id_number: data?.service_issued_id_number,
+      service_issued_id_date_of_issue: data?.service_issued_id_date_of_issue,
+      service_issued_id_date_of_expiry: data?.service_issued_id_date_of_expiry,
+      start_date: data?.start_date,
+      duration_requested_years: data?.duration_requested_years,
+      highest_level_of_education: data?.highest_level_of_education,
+      year_completed: data?.year_completed,
+      professional_skill: data?.professional_skill,
+      is_spouse_or_child_citizen_et: stringToBoolean(
+        data?.is_spouse_or_child_citizen_et
+      ),
+      preferred_job_title: data?.preferred_job_title,
+      middle_name: data?.middle_name,
+      educations: [
+        {
+          date_received: data?.date_received,
+          field_of_study: data?.field_of_study,
+          institute_name: data?.institute_name,
+          level_of_education: data?.highest_level_of_education,
+        },
+      ],
+      documents: project_image,
+      skills: {
+        skills: [data?.professional_skill],
+      },
+      spouse_child_citizenships: [
+        {
+          is_child_citizen: stringToBoolean(data?.is_child_citizen),
+          is_spouse: stringToBoolean(data?.is_spouse),
+          spouse_or_child_name: data?.spouse_or_child_name,
+        },
+      ],
+    };
+
+    addRefugeeRequest(fieldData);
     console.log(data, "yy");
   };
 
@@ -181,14 +326,12 @@ const Home = () => {
               </div>
             </div>
             <div className="relative w-36 h-36 ml-10">
-              {/* Profile Image */}
               <img
                 src={profileImage}
                 alt="Profile"
                 className="w-full h-full rounded-full object-cover"
               />
 
-              {/* Hidden file input for uploading */}
               <input
                 type="file"
                 accept="image/*"
@@ -196,8 +339,6 @@ const Home = () => {
                 id="imageUpload"
                 onChange={handleImageChange} // Call function on file selection
               />
-
-              {/* Upload Icon - only visible on hover */}
               <label
                 htmlFor="imageUpload"
                 className="absolute inset-0 flex items-center justify-center bg-black bg-opacity-50 rounded-full cursor-pointer opacity-0 hover:opacity-100 transition-opacity duration-300"
@@ -233,13 +374,13 @@ const Home = () => {
                   />
                 </div>
                 <div>
-                  {/* <input
+                  <input
                     type="text"
                     {...register("middle_name", { required: true })}
                     id="middle_name"
                     className="bg-gray-50 ml-10 border-gray-300 text-sm rounded-md focus:ring-blue-500 focus:border-blue-500 block p-2.5 dark:placeholder-gray-400 dark:text-black dark:focus:ring-blue-500 dark:focus:border-blue-500"
                     placeholder="Middle Name"
-                  /> */}
+                  />
                 </div>
                 <div>
                   <input
@@ -264,7 +405,6 @@ const Home = () => {
                   create the work permit process.
                 </p>
 
-                {/* Gender Selection Section */}
                 <div className="flex flex-row mt-10 space-x-14">
                   <div className="flex flex-row items-center">
                     <div>
@@ -295,7 +435,6 @@ const Home = () => {
                     )}
                   </select>
 
-                  {/* Date of Birth Section */}
                   <div className="flex flex-row items-center ml-16">
                     <div>
                       <IoCalendarOutline className="text-[#2C7FE0] mt-1" />
@@ -382,7 +521,54 @@ const Home = () => {
             </div>
 
             <div className="flex flex-row mt-10 space-x-14">
-              {/* Document Selection */}
+              <div className="flex flex-row">
+                <MdDashboard className="text-[#2C7FE0] mt-1" />
+                <div className="ml-3">
+                  <div>start_date</div>
+                </div>
+                <div className="flex flex-row  space-x-4 ml-3">
+                  <div className="flex flex-col items-center ">
+                    <div className="flex items-center justify-center w-full">
+                      <input
+                        type="date"
+                        {...register("start_date", {
+                          required: true,
+                        })}
+                        className="bg-gray-50 border border-gray-300 text-gray-900 text-sm rounded-lg focus:ring-blue-500 focus:border-blue-500 block w-full p-2.5"
+                        placeholder="Year"
+                      />
+                      {errors.start_date && (
+                        <span className="text-red-500">
+                          This field is required
+                        </span>
+                      )}
+                    </div>
+                  </div>
+                </div>
+              </div>
+
+              <div className="flex flex-row items-center mb-2">
+                <div className="flex flex-row items-center">
+                  <MdDashboard className="text-[#2C7FE0] mt-1" />
+                  <div className="ml-3">
+                    <div>service issued number</div>
+                  </div>
+                </div>
+                <div className="flex flex-row  space-x-4 ml-3">
+                  <input
+                    type="text"
+                    {...register("service_issued_id_number", {
+                      required: true,
+                    })}
+                    id="service_issued_id_number"
+                    className="bg-gray-50 ml-10 border-gray-300 text-sm rounded-md focus:ring-blue-500 focus:border-blue-500 block p-2.5 dark:placeholder-gray-400 dark:text-black dark:focus:ring-blue-500 dark:focus:border-blue-500"
+                    placeholder="Last Name"
+                  />
+                </div>
+              </div>
+            </div>
+
+            <div className="flex flex-row mt-10 space-x-14">
               <div className="flex flex-row">
                 <MdDashboard className="text-[#2C7FE0] mt-1" />
                 <div className="ml-3">
@@ -407,7 +593,7 @@ const Home = () => {
                 <div className="flex flex-row  space-x-4 ml-3">
                   <div className="flex flex-col items-center ">
                     <div className="flex items-center justify-center w-full">
-                      {!selectedDocument?.name ? (
+                      {!selectedDocument?.file?.name ? (
                         <label className="flex flex-col items-center justify-center w-full rounded-lg cursor-pointer bg-[#E5EDF5] hover:bg-gray-100 dark:border-gray-600 dark:hover:border-gray-500 dark:hover:bg-gray-600">
                           <div className="flex flex-col items-center justify-center pt-5 pb-6">
                             <svg
@@ -456,7 +642,7 @@ const Home = () => {
                               />
                             </svg>
                             <span className="text-sm text-gray-700">
-                              {selectedDocument?.name}
+                              {selectedDocument?.file?.name}
                             </span>
                           </div>
                           <AiOutlineDelete
@@ -470,8 +656,6 @@ const Home = () => {
                   </div>
                 </div>
               </div>
-
-              {/* Service Issued ID */}
 
               <div className="flex flex-row items-center mb-2">
                 <div className="flex flex-row items-center">
@@ -496,7 +680,7 @@ const Home = () => {
                   </div>
                 </div>
                 <div className="flex flex-row  space-x-4 ml-3">
-                  {!selectedServiceDocument?.name ? (
+                  {!selectedServiceDocument?.file?.name ? (
                     <label className="flex flex-col items-center justify-center w-full rounded-lg cursor-pointer bg-[#E5EDF5] hover:bg-gray-100 dark:border-gray-600 dark:hover:border-gray-500 dark:hover:bg-gray-600">
                       <div className="flex flex-col items-center justify-center pt-5 pb-6">
                         <svg
@@ -545,7 +729,7 @@ const Home = () => {
                           />
                         </svg>
                         <span className="text-sm text-gray-700">
-                          {selectedServiceDocument?.name}
+                          {selectedServiceDocument?.file.name}
                         </span>
                       </div>
                       <AiOutlineDelete
@@ -556,6 +740,168 @@ const Home = () => {
                     </div>
                   )}
                 </div>
+              </div>
+            </div>
+            <div className="flex flex-row items-center mt-10 ">
+              <div className="flex flex-row items-center">
+                <MdDashboard className="text-[#2C7FE0] mt-1" />
+                <div className="ml-3">
+                  <div>service issued</div>
+                </div>
+              </div>
+              <div className="flex flex-row  space-x-4 ml-3">
+                <div className="flex flex-col items-center ml-9">
+                  <input
+                    type="date"
+                    {...register("service_issued_id_date_of_issue", {
+                      required: true,
+                    })}
+                    className="bg-gray-50 border border-gray-300 text-gray-900 text-sm rounded-lg focus:ring-blue-500 focus:border-blue-500 block w-full p-2.5"
+                    placeholder="Year"
+                  />
+                  {errors.service_issued_id_date_of_issue && (
+                    <span className="text-red-500">This field is required</span>
+                  )}
+                </div>
+              </div>
+              <div className="flex flex-row items-center ml-20">
+                <MdDashboard className="text-[#2C7FE0] mt-1" />
+                <div className="ml-3">
+                  <div>
+                    service issued_id <br />
+                    date of expiry
+                  </div>
+                </div>
+              </div>
+              <div className="flex flex-row  space-x-4 ml-">
+                <div className="flex flex-col items-center ml-9">
+                  <input
+                    type="date"
+                    {...register("service_issued_id_date_of_expiry", {
+                      required: true,
+                    })}
+                    className="bg-gray-50 border border-gray-300 text-gray-900 text-sm rounded-lg focus:ring-blue-500 focus:border-blue-500 block w-full p-2.5"
+                    placeholder="Year"
+                  />
+                  {errors.service_issued_id_date_of_expiry && (
+                    <span className="text-red-500">This field is required</span>
+                  )}
+                </div>
+              </div>
+            </div>
+            <div className="flex flex-row items-center  mt-10">
+              <div className="flex flex-row items-center">
+                <MdDashboard className="text-[#2C7FE0] mt-1" />
+                <div className="ml-3">
+                  <div>duration requested years</div>
+                </div>
+              </div>
+              <div className="flex flex-row  space-x-4 ml-3">
+                <input
+                  type="number"
+                  {...register("duration_requested_years", {
+                    required: true,
+                  })}
+                  id="duration_requested_years"
+                  className="bg-gray-50 ml-10 border-gray-300 text-sm rounded-md focus:ring-blue-500 focus:border-blue-500 block p-2.5 dark:placeholder-gray-400 dark:text-black dark:focus:ring-blue-500 dark:focus:border-blue-500"
+                  placeholder="duration years"
+                />
+              </div>
+
+              <div className="flex flex-row items-center">
+                <MdDashboard className="text-[#2C7FE0] mt-1" />
+                <div className="ml-3">
+                  <div>is spouse/child citizen</div>
+                </div>
+              </div>
+              <div className="flex flex-row  space-x-4 ml-3">
+                <select
+                  {...register("is_spouse_or_child_citizen_et", {
+                    required: "This field is required",
+                  })}
+                  className="ml-8 w-46 px-16 border-2 p-3  border-gray-300 rounded-lg "
+                >
+                  <option
+                    value="true"
+                    className="px-4"
+                    onClick={() => setchild(true)}
+                  >
+                    True
+                  </option>
+                  <option
+                    value="false"
+                    className="px-4"
+                    onClick={() => setchild(false)}
+                  >
+                    False
+                  </option>
+                </select>
+              </div>
+            </div>
+            <div className="flex flex-row items-center  mt-10">
+              <div className="flex flex-row items-center">
+                <MdDashboard className="text-[#2C7FE0] mt-1" />
+                <div className="ml-3">
+                  <div>is child citizen</div>
+                </div>
+              </div>
+              <div className="flex flex-row  space-x-4 ml-3">
+                <select
+                  {...register("is_child_citizen", {
+                    required: "This field is required",
+                  })}
+                  className="ml-8 w-46 px-16 border-2 p-3  border-gray-300 rounded-lg "
+                >
+                  <option value="true" className="px-4">
+                    True
+                  </option>
+                  <option value="false" className="px-4">
+                    False
+                  </option>
+                </select>
+              </div>
+              <div className="flex flex-row items-center ml-10">
+                <MdDashboard className="text-[#2C7FE0] mt-1" />
+                <div className="ml-3">
+                  <div>is spouse</div>
+                </div>
+              </div>
+              <div className="flex flex-row  space-x-4 ml-3">
+                <select
+                  {...register("is_spouse", {
+                    required: "This field is required",
+                  })}
+                  className="ml-8 w-46 px-16 border-2 p-3  border-gray-300 rounded-lg "
+                >
+                  <option value="true" className="px-4">
+                    True
+                  </option>
+                  <option value="false" className="px-4">
+                    False
+                  </option>
+                </select>
+              </div>
+            </div>
+
+            <div className="flex flex-row items-center  mt-10">
+              <div className="flex flex-row items-center ml-10">
+                <MdDashboard className="text-[#2C7FE0] mt-1" />
+                <div className="ml-3">
+                  <div>spouse/child_name</div>
+                </div>
+              </div>
+              <div className="flex flex-row  space-x-4 ml-3">
+                <input
+                  type="date"
+                  {...register("spouse_or_child_name", {
+                    required: true,
+                  })}
+                  className="bg-gray-50 border border-gray-300 text-gray-900 text-sm rounded-lg focus:ring-blue-500 focus:border-blue-500 block w-full p-2.5"
+                  placeholder="Year"
+                />
+                {errors.spouse_or_child_name && (
+                  <span className="text-red-500">This field is required</span>
+                )}
               </div>
             </div>
 
@@ -576,15 +922,15 @@ const Home = () => {
               <div className="flex flex-col items-center ml-32">
                 <input
                   type="text"
-                  // {...register("institute_name", { required: true })}
+                  {...register("institute_name", { required: true })}
                   className="bg-gray-50 border border-gray-300 text-gray-900 text-sm rounded-lg focus:ring-blue-500 focus:border-blue-500 block w-full p-2.5"
                   placeholder="Institute"
                 />
-                {/* {errors.institute_name && (
+                {errors.institute_name && (
                   <span className="text-red-500">
                     Institute name is required
                   </span>
-                )} */}
+                )}
               </div>
 
               <div className="flex flex-row ml-14">
@@ -598,15 +944,15 @@ const Home = () => {
               <div className="flex flex-col items-center ml-10">
                 <input
                   type="text"
-                  // {...register("field_of_study", { required: true })}
+                  {...register("field_of_study", { required: true })}
                   className="bg-gray-50 border border-gray-300 text-gray-900 text-sm rounded-lg focus:ring-blue-500 focus:border-blue-500 block w-full p-2.5"
                   placeholder="Field"
                 />
-                {/* {errors.field_of_study && (
+                {errors.field_of_study && (
                   <span className="text-red-500">
                     Field of study is required
                   </span>
-                )} */}
+                )}
               </div>
             </div>
 
@@ -676,7 +1022,7 @@ const Home = () => {
                   </div>
                 </div>
               </div>
-              {!selectedEducationDocument?.name ? (
+              {!selectedEducationDocument?.file?.name ? (
                 <label className="flex flex-col items-center justify-center w-full rounded-lg cursor-pointer bg-[#E5EDF5] hover:bg-gray-100 dark:border-gray-600 dark:hover:border-gray-500 dark:hover:bg-gray-600">
                   <div className="flex flex-col items-center justify-center pt-5 pb-6">
                     <svg
@@ -725,7 +1071,7 @@ const Home = () => {
                       />
                     </svg>
                     <span className="text-sm text-gray-700">
-                      {selectedEducationDocument?.name}
+                      {selectedEducationDocument?.file?.name}
                     </span>
                   </div>
                   <AiOutlineDelete
@@ -735,6 +1081,24 @@ const Home = () => {
                   />
                 </div>
               )}
+              <div className="flex flex-row">
+                <MdDashboard className="text-[#2C7FE0] mt-1" />
+                <div className="ml-3 flex flex-col">
+                  <div>date received</div>
+                </div>
+              </div>
+              <div className="relative max-w-sm ml-3">
+                <input
+                  id="datepicker-format"
+                  datepicker-format="mm-dd-yyyy"
+                  type="date"
+                  {...register("date_received", {
+                    required: "Date  is required",
+                  })}
+                  className=" w-46 px-6   bg-gray-50 border border-gray-300 text-gray-900 text-sm rounded-lg focus:ring-blue-500 focus:border-blue-500 block w-full p-2.5 dark:placeholder-gray-400 dark:focus:ring-blue-500 dark:focus:border-blue-500"
+                  placeholder="Select date"
+                />
+              </div>
             </div>
 
             <hr className="my-4 border-t border-gray-300 mt-10" />
@@ -742,52 +1106,6 @@ const Home = () => {
               <h2 className="text-md font-semibold mb-2 text-[#2C7DD6]">
                 Work Experience
               </h2>
-            </div>
-            <div className="flex flex-row mt-10 ">
-              <div className="flex flex-row">
-                <div className="flex flex-row">
-                  <MdDashboard className="text-[#2C7FE0] mt-1" />
-                  <div className="flex flex-col ml-2">
-                    <div className="ml-3">Organization</div>
-                  </div>
-                </div>
-                <div className="flex flex-col items-center ml-20">
-                  <input
-                    // {...register("organization", { required: true })}
-                    type="text"
-                    className="bg-gray-50 border border-gray-300 text-gray-900 text-sm rounded-lg focus:ring-blue-500 focus:border-blue-500 block w-full p-2.5 dark:placeholder-gray-400 dark:text-black dark:focus:ring-blue-500 dark:focus:border-blue-500"
-                    placeholder="Organization"
-                  />
-                  {/* {errors.organization && (
-                    <span className="text-red-500">
-                      Organization is required
-                    </span>
-                  )} */}
-                </div>
-              </div>
-              <div className="flex flex-row ml-10">
-                <div>
-                  <MdDashboard className="text-[#2C7FE0] mt-1" />
-                </div>
-                <div className="flex flex-col">
-                  <div className="text-[15px] font-bold text-gray-500 ml-2">
-                    Industry Sector
-                  </div>
-                </div>
-                <div className="flex flex-col items-center ml-14">
-                  <input
-                    // {...register("industry_sector", { required: true })}
-                    type="text"
-                    className="bg-gray-50 border border-gray-300 text-gray-900 text-sm rounded-lg focus:ring-blue-500 focus:border-blue-500 block w-full p-2.5 dark:placeholder-gray-400 dark:text-black dark:focus:ring-blue-500 dark:focus:border-blue-500"
-                    placeholder="Skill"
-                  />
-                  {/* {errors.industry_sector && (
-                    <span className="text-red-500">
-                      Industry Sector is required
-                    </span>
-                  )} */}
-                </div>
-              </div>
             </div>
 
             <div className="flex flex-row mt-10 ">
@@ -844,32 +1162,11 @@ const Home = () => {
 
             <div className="flex flex-row mt-10">
               <div className="flex flex-row">
-                <MdDashboard className="text-[#2C7FE0] mt-1" />
-                <div className="flex flex-col ml-2">
-                  <div className="ml-3">Gross Salary</div>
-                </div>
-              </div>
-              <div className=" items-center ml-20">
-                <input
-                  // {...register("gross_salary", {
-                  //   required: "Gross salary is required",
-                  // })}
-                  type="text"
-                  className="bg-gray-50  border border-gray-300 text-gray-900 text-sm rounded-lg focus:ring-blue-500 focus:border-blue-500 block p-2.5 dark:placeholder-gray-400 dark:text-black dark:focus:ring-blue-500 dark:focus:border-blue-500"
-                  placeholder="Amount in ETB"
-                />
-                {/* {errors.gross_salary && (
-                  <span className="text-red-500">
-                    {errors.gross_salary.message}
-                  </span>
-                )} */}
-              </div>{" "}
-              <div className="flex flex-row ml-10">
                 <div>
                   <MdDashboard className="text-[#2C7FE0] mt-1" />
                 </div>
                 <div>
-                  <div className="flex flex-col">
+                  <div className="flex flex-col ml-3">
                     <div>Curriculum Vitae</div>
                     <div className="text-gray-300 text-[12px] mt-3">
                       Accepted File types
@@ -888,7 +1185,7 @@ const Home = () => {
                 </div>
                 <div className="flex flex-row space-x-4 ml-14">
                   <div className="flex flex-col items-center">
-                    {!selectedCurriculumDocument?.name ? (
+                    {!selectedCurriculumDocument?.file?.name ? (
                       <label className="flex flex-col items-center justify-center w-full rounded-lg cursor-pointer bg-[#E5EDF5] hover:bg-gray-100 dark:border-gray-600 dark:hover:border-gray-500 dark:hover:bg-gray-600">
                         <div className="flex flex-col items-center justify-center pt-5 pb-6">
                           <svg
@@ -937,7 +1234,7 @@ const Home = () => {
                             />
                           </svg>
                           <span className="text-sm text-gray-700">
-                            {selectedCurriculumDocument?.name}
+                            {selectedCurriculumDocument?.file?.name}
                           </span>
                         </div>
                         <AiOutlineDelete
@@ -951,10 +1248,6 @@ const Home = () => {
                 </div>
               </div>
             </div>
-
-            {/* Curriculum Vitae Field */}
-
-            {/* File Upload */}
           </div>
           <div className="flex flex-row gap-4 mt-10 w-96 justify-end">
             <button className="flex-1 bg-white border border-[#2C7DD6] text-[#2C7DD6] py-2 px-4 rounded-md">
