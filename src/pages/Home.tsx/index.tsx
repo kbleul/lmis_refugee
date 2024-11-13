@@ -8,7 +8,11 @@ import { FaPhone } from "react-icons/fa";
 import FileUpload from "../../components/File";
 import { addRefugeeRequest, uploadFiles } from "../../util/service/refugee";
 import { useForm } from "react-hook-form";
-import { AiOutlineDelete, AiOutlineUpload } from "react-icons/ai";
+import {
+  AiOutlineDelete,
+  AiOutlineLoading3Quarters,
+  AiOutlineUpload,
+} from "react-icons/ai";
 import { useSelect } from "@refinedev/core";
 import Loader from "../../components/loader";
 import { FormInputs } from "../../type/addrefugee";
@@ -26,7 +30,7 @@ const Home = () => {
   const [selectedCurriculumDocument, setSelectedCurriculumDocument] =
     useState<any>(null);
   const [profileImage, setProfileImage] = useState(
-    "https://pics.craiyon.com/2023-11-26/oMNPpACzTtO5OVERUZwh3Q.webp"
+    "https://img.freepik.com/premium-vector/user-profile-icon-flat-style-member-avatar-vector-illustration-isolated-background-human-permission-sign-business-concept_157943-15752.jpg"
   );
 
   const { query: queryNationality } = useSelect<{ id: string; name: string }>({
@@ -196,7 +200,7 @@ const Home = () => {
         document_type_id: "65dc2ac2-a20c-4a9f-a1f9-a0da8fc4c771",
         title: "Proof of Ethiopian Spouse or Child",
         properties: JSON.stringify({
-          name: selectedDocument.file,
+          name: selectedDocument?.file,
           path: uploadedFile?.responce?.uploadFile?.info?.Key,
           title: "Proof of Ethiopian Spouse or Child",
           category: "d08e89f1-a368-4d02-931d-9f611dba9cd2",
@@ -216,7 +220,7 @@ const Home = () => {
         document_type_id: "8e2f0892-9360-4c43-9816-e272854ec626",
         title: "Service-Issued ID",
         properties: JSON.stringify({
-          name: selectedDocument.file,
+          name: selectedDocument?.file,
           path: uploadedFile?.responce?.uploadFile?.info?.Key,
           title: "Service-Issued ID",
           category: "d08e89f1-a368-4d02-931d-9f611dba9cd2",
@@ -237,7 +241,7 @@ const Home = () => {
         document_type_id: "e302dd40-8fd9-423d-a24f-096f5916729b",
         title: "Educational certificate and Work experience of refugee",
         properties: JSON.stringify({
-          name: selectedDocument.file,
+          name: selectedDocument?.file,
           path: uploadedFile?.responce?.uploadFile?.info?.Key,
           title: "Educational certificate and Work experience of refugee",
           category: "d08e89f1-a368-4d02-931d-9f611dba9cd2",
@@ -258,7 +262,7 @@ const Home = () => {
         document_type_id: "228d72d1-b34b-4a99-94a9-464fe009f881",
         title: "CV",
         properties: JSON.stringify({
-          name: selectedDocument.file,
+          name: selectedDocument?.file,
           path: uploadedFile?.responce?.uploadFile?.info?.Key,
           title: "CV",
           category: "d08e89f1-a368-4d02-931d-9f611dba9cd2",
@@ -268,7 +272,7 @@ const Home = () => {
 
       project_image.push(projectImageObject);
     }
-    console.log(JSON.stringify(selectedCurriculumDocument.file), "+");
+
     const fieldData = {
       first_name: data?.first_name,
       last_name: data?.last_name,
@@ -314,14 +318,23 @@ const Home = () => {
       await addRefugeeRequest(fieldData);
       toast.success("Form submitted successfully!");
       setLoading(false);
-
-      // Reset form after successful submission
       reset();
+      setSelectedServiceDocument(null);
+      setSelectedDocument(null);
+      setSelectedCurriculumDocument(null);
+      setSelectedEducationDocument(null);
     } catch (error) {
       toast.error("Failed to submit the form.");
       setLoading(false);
     }
-    console.log(data, "yy");
+  };
+
+  const handleCancel = () => {
+    reset();
+    setSelectedServiceDocument(null);
+    setSelectedDocument(null);
+    setSelectedCurriculumDocument(null);
+    setSelectedEducationDocument(null);
   };
 
   return (
@@ -1171,31 +1184,29 @@ const Home = () => {
               </div>
 
               <div className="flex flex-row mt-10">
-<section className="w-1/2 flex">
-<div className="flex flex-row">
+                <section className="w-1/2 flex">
                   <div className="flex flex-row">
-                    <MdDashboard className="text-[#2C7FE0] mt-1" />
-                    <div className="flex flex-col ml-1">
-                      <div className="ml-3">Professional Skill</div>
+                    <div className="flex flex-row">
+                      <MdDashboard className="text-[#2C7FE0] mt-1" />
+                      <div className="flex flex-col ml-1">
+                        <div className="ml-3">Professional Skill</div>
+                      </div>
+                    </div>
+                    <div className="flex flex-col items-center">
+                      <input
+                        {...register("professional_skill")}
+                        type="text"
+                        className="bg-gray-50 border ml-[54%] border-gray-300 text-gray-900 text-sm rounded-lg focus:ring-blue-500 focus:border-blue-500 block p-2.5 dark:placeholder-gray-400 dark:text-black dark:focus:ring-blue-500 dark:focus:border-blue-500"
+                        placeholder="Skill"
+                      />
+                      {errors.professional_skill && (
+                        <span className="text-red-500">
+                          {errors.professional_skill.message}
+                        </span>
+                      )}
                     </div>
                   </div>
-                  <div className="flex flex-col items-center">
-                    <input
-                      {...register("professional_skill")}
-                      type="text"
-                      className="bg-gray-50 border ml-[54%] border-gray-300 text-gray-900 text-sm rounded-lg focus:ring-blue-500 focus:border-blue-500 block p-2.5 dark:placeholder-gray-400 dark:text-black dark:focus:ring-blue-500 dark:focus:border-blue-500"
-                      placeholder="Skill"
-                    />
-                    {errors.professional_skill && (
-                      <span className="text-red-500">
-                        {errors.professional_skill.message}
-                      </span>
-                    )}
-                  </div>
-                </div>
-</section>
-
-               
+                </section>
 
                 <div className="flex flex-row ml-12">
                   <div>
@@ -1313,18 +1324,20 @@ const Home = () => {
                 </div>
               </div>
             </div>
-            <div className="flex flex-row gap-4 mt-10 w-full  justify-end">
-              <button type="button" className=" bg-white border border-[#2C7DD6] text-[#2C7DD6] w-[200px] py-2 px-4 rounded-md">
+            <div className="flex flex-row gap-4 mt-10 w-full justify-end ">
+              <div
+                onClick={() => handleCancel()}
+                className="flex justify-center items-center bg-white border w-56 cursor-pointer border-[#2C7DD6] text-[#2C7DD6] py-2 px-4 rounded-md"
+              >
                 Cancel
+              </div>
+              <button className="flex items-center justify-center w-56  bg-[#2C7DD6] text-white py-2 px-4 rounded-md">
+                {loading ? (
+                  <AiOutlineLoading3Quarters className="animate-spin mr-2 text-white" />
+                ) : (
+                  "Continue"
+                )}
               </button>
-              <button className=" border bg-[#2C7DD6] text-[#fff] w-[200px] py-2 px-4 rounded-md">
-              {loading ? (
-                <span className="loader mr-2"></span> // Custom spinner class
-              ) : (
-                "Continue"
-              )}
-              </button>
-              
             </div>
           </div>
         </div>
