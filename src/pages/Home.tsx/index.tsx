@@ -33,6 +33,21 @@ const Home = () => {
     "https://img.freepik.com/premium-vector/user-profile-icon-flat-style-member-avatar-vector-illustration-isolated-background-human-permission-sign-business-concept_157943-15752.jpg"
   );
 
+  const [fileErrors, setFileErrors] = useState<{
+    profile: any,
+    spouseProfe: any,
+    serviceId: any,
+    education: any,
+    cv: any
+  }>({
+    profile: null,
+    spouseProfe: null,
+    serviceId: null,
+    education: null,
+    cv: null
+  });
+
+
   const { query: queryNationality } = useSelect<{ id: string; name: string }>({
     resource: "base_nationalities",
     meta: {
@@ -417,6 +432,7 @@ const Home = () => {
                   className="w-full h-full rounded-full object-cover"
                 />
 
+                    
                 <input
                   type="file"
                   accept="image/*"
@@ -552,7 +568,7 @@ const Home = () => {
                       </div>
                     </div>
                   </div>
-                  <div className="relative w-1/2 ml-3 flex justify-center">
+                  <div className="relative w-1/2 ml-3 flex flex-col justify-center">
                     <input
                       id="datepicker-format"
                       datepicker-format="mm-dd-yyyy"
@@ -613,7 +629,7 @@ const Home = () => {
                 </div>
               </section>
 
-              <section className="flex justify-start">
+              <section className="flex justify-start w-1/2">
                 <div className="flex flex-row ">
                   <div>
                     <BsPersonStanding className=" text-[#2C7FE0] mt-1" />
@@ -630,12 +646,12 @@ const Home = () => {
                     </div>
                   </div>
                 </div>
-                <div className="flex items-start justify-center border w-1/2">
+                <div className="flex items-start justify-center w-1/2">
                   <select
                     {...register("marital_status_id", {
                       required: true,
                     })}
-                    className="w-[14rem] px-4 pt-2 pb-3 bg-gray-100 justify-self-center rounded-lg "
+                    className="w-[14.5rem] px-4 pt-2 pb-3 bg-gray-100 justify-self-center rounded-lg "
                   >
                     {queryMaritailStatus?.data?.data?.map(
                       (option: { name: string; id: string }) => (
@@ -668,9 +684,9 @@ const Home = () => {
                     className="bg-gray-50 border border-gray-300 text-gray-900 text-sm rounded-lg w-[14rem]  focus:ring-blue-500 focus:border-blue-500 block  p-2.5"
                     placeholder="Year"
                   />
-                  {errors.date_of_birth && (
+                  {errors.start_date && (
                     <span className="text-red-500 text-xs mt-2">
-                      * DOB is required
+                      * Start date is required
                     </span>
                   )}
                 </div>
@@ -726,6 +742,8 @@ const Home = () => {
                         jpeg | jpg | png
                       </span>
                     </div>
+                    
+                  
                   </div>
                 </div>
 
@@ -762,6 +780,9 @@ const Home = () => {
                             onChange={handleFileChange} // Handle file selection
                             required={getValues().first_name ? true : false}
                           />
+                         {!selectedDocument && <span className="text-red-500 text-xs pt-6">
+                        * Required
+                      </span>}
                         </label>
                       ) : (
                         // Display selected document card with remove icon
@@ -797,7 +818,7 @@ const Home = () => {
                 </div>
               </div>
 
-              <div className="flex flex-row items-center mb-2 w-1/2 pl-8">
+              <div className="flex flex-row items-center mb-2 w-1/2 ">
                 <div className="flex flex-row items-center w-2/5">
                   <MdDashboard className="text-[#2C7FE0] mt-1" />
                   <div className="ml-3">
@@ -850,6 +871,9 @@ const Home = () => {
                         onChange={handleServiceFileChange} // Handle file selection
                         required={getValues().first_name ? true : false}
                       />
+                        {!selectedServiceDocument && <span className="text-red-500 text-xs mt-6">
+                        * Required
+                      </span>}
                     </label>
                   ) : (
                     // Display selected document card with remove icon
@@ -912,6 +936,7 @@ const Home = () => {
                 </div>
               </section>
 
+              <section className="w-1/2 flex justify-between">
               <div className="flex flex-row items-center">
                 <MdDashboard className="text-[#2C7FE0] mt-1" />
                 <div className="ml-3">
@@ -921,8 +946,8 @@ const Home = () => {
                   </div>
                 </div>
               </div>
-              <div className="flex flex-row  space-x-4 ml-">
-                <div className="flex flex-col items-start ml-9">
+              <div className="flex flex-row  w-1/2">
+                <div className="flex flex-col items-start">
                   <input
                     type="date"
                     {...register("service_issued_id_date_of_expiry", {
@@ -947,16 +972,18 @@ const Home = () => {
                   )}
                 </div>
               </div>
+</section>
+             
             </div>
             <div className="flex flex-row items-start mt-10">
-              <section className="w-1/2 flex">
+              <section className="w-1/2 flex items-start">
                 <div className="flex flex-row items-center">
                   <MdDashboard className="text-[#2C7FE0] mt-1" />
                   <div className="ml-3">
                     <div>duration requested years *</div>
                   </div>
                 </div>
-                <div className="flex flex-col  space-x-4 ml-3">
+                <div className="flex flex-col w-1/2 space-x-4 ml-3">
                   <input
                     type="number"
                     {...register("duration_requested_years", {
@@ -974,8 +1001,9 @@ const Home = () => {
                 </div>
               </section>
 
-              <section className="flex flex-row items-start mt-10">
-                <div className="flex flex-row items-center ml-14">
+              
+              <section className="w-1/2 flex flex-row items-start mt-10">
+                <div className="flex flex-row items-center ml-8">
                   <MdDashboard className="text-[#2C7FE0] mt-1" />
                   <div className="ml-3">
                     <div>is spouse/child citizen *</div>
@@ -1023,14 +1051,14 @@ const Home = () => {
                   </div>
                 </section>
 
-                <div className="flex flex-row items-center   w-1/2 ">
-                  <div className="flex flex-row items-center ml-14">
+                <div className="flex flex-row items-center  w-1/2 ">
+                  <div className="flex flex-row items-center ml-8">
                     <MdDashboard className="text-[#2C7FE0] mt-1" />
                     <div className="ml-3">
                       <div>spouse/child_name *</div>
                     </div>
                   </div>
-                  <div className="flex flex-col  space-x-4 ml-3">
+                  <div className="flex flex-col  space-x-4 ml-10">
                     <input
                       type="text"
                       {...register("spouse_or_child_name", {
@@ -1214,6 +1242,11 @@ const Home = () => {
                         required={getValues().first_name ? true : false}
                         onChange={handleEducationFileChange} // Handle file selection
                       />
+                      {!selectedEducationDocument && (
+                    <span className="text-red-500 text-xs mt-2 pl-7">
+                      * Required
+                    </span>
+                  )}
                     </label>
                   ) : (
                     // Display selected document card with remove icon
@@ -1254,7 +1287,7 @@ const Home = () => {
                     <div>Date Received *</div>
                   </div>
                 </div>
-                <div className="relative max-w-sm ml-3">
+                <div className="relative max-w-sm">
                   <input
                     id="datepicker-format"
                     datepicker-format="mm-dd-yyyy"
@@ -1262,7 +1295,7 @@ const Home = () => {
                     {...register("date_received", {
                       required: true,
                     })}
-                    className=" w-46 px-6   bg-gray-50 border border-gray-300 text-gray-900 text-sm rounded-lg focus:ring-blue-500 focus:border-blue-500 block w-[14rem] ml-16 p-2.5 dark:placeholder-gray-400 dark:focus:ring-blue-500 dark:focus:border-blue-500"
+                    className=" w-46 px-6   bg-gray-50 border border-gray-300 text-gray-900 text-sm rounded-lg focus:ring-blue-500 focus:border-blue-500 block w-[14rem] ml-12 p-2.5 dark:placeholder-gray-400 dark:focus:ring-blue-500 dark:focus:border-blue-500"
                     placeholder="Select date"
                   />
                   {errors.date_received && (
@@ -1387,6 +1420,11 @@ const Home = () => {
                           className="hidden"
                           onChange={handleCurriculumFileChange} // Handle file selection
                         />
+                        {!selectedCurriculumDocument && (
+                    <span className="text-red-500 text-xs mt-2 ml-16">
+                      * required
+                    </span>
+                  )}
                       </label>
                     ) : (
                       // Display selected document card with remove icon
