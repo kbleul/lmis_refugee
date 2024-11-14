@@ -15,7 +15,7 @@ import {
 import { useSelect } from "@refinedev/core";
 import { FormInputs } from "../../type/addrefugee";
 import { toast, ToastContainer } from "react-toastify";
-import { checkIsStringLetter } from "../../util/methods/form";
+import { checkIsStringLetter, validateMinAge } from "../../util/methods/form";
 
 export const SELECT_QUERY = ["id", "name"];
 
@@ -190,12 +190,13 @@ const Home = () => {
   };
   const {
     register,
+    formState: { errors },
     handleSubmit,
     getValues,
     reset,
-    formState: { errors },
+    watch,
   } = useForm<FormInputs>();
-  const [child, setchild] = useState(false);
+  const [child, setchild] = useState(true);
   const onSubmit = async (data: FormInputs) => {
     const project_image = [];
     setLoading(true);
@@ -220,7 +221,6 @@ const Home = () => {
       project_image.push(projectImageObject);
     }
     if (selectedDocument?.file?.name) {
-      console.log(selectedDocument);
       const uploadedFile: any = await uploadFiles({
         file: selectedDocument.base64,
         extension: selectedDocument.file.type,
@@ -375,6 +375,7 @@ const Home = () => {
     setprofileimage(null);
   };
 
+  const issueDate = watch("service_issued_id_date_of_issue");
   return (
     <div>
       <ToastContainer position="top-right" autoClose={3000} />
@@ -421,7 +422,7 @@ const Home = () => {
                   accept="image/*"
                   className="hidden"
                   id="imageUpload"
-                  required
+                  required={getValues().first_name ? true : false}
                   onChange={handleImageChange} // Call function on file selection
                 />
                 <label
@@ -432,6 +433,7 @@ const Home = () => {
                 </label>
               </div>
             </div>
+
             <div className="flex flex-col  ">
               <hr className="my-4 border-t border-gray-300" />
               <div className="flex flex-row mt-6 space-x-0">
@@ -456,8 +458,13 @@ const Home = () => {
                       id="first_name"
                       className="bg-gray-50 ml-12 border-gray-300 text-sm rounded-md focus:ring-blue-500 focus:border-blue-500 block p-2.5 dark:placeholder-gray-400 dark:text-black dark:focus:ring-blue-500 dark:focus:border-blue-500"
                       placeholder="First Name"
-                      onKeyDown={e => checkIsStringLetter(e)}
+                      onKeyDown={(e) => checkIsStringLetter(e)}
                     />
+                    {errors.first_name && (
+                      <span className="text-red-500 text-xs ml-12">
+                        * First name is required
+                      </span>
+                    )}
                   </div>
                   <div>
                     <input
@@ -466,8 +473,13 @@ const Home = () => {
                       id="middle_name"
                       className="bg-gray-50 ml-10 border-gray-300 text-sm rounded-md focus:ring-blue-500 focus:border-blue-500 block p-2.5 dark:placeholder-gray-400 dark:text-black dark:focus:ring-blue-500 dark:focus:border-blue-500"
                       placeholder="Middle Name"
-                      onKeyDown={e => checkIsStringLetter(e)}
+                      onKeyDown={(e) => checkIsStringLetter(e)}
                     />
+                    {errors.middle_name && (
+                      <span className="text-red-500 text-xs ml-12">
+                        * Middle name is required
+                      </span>
+                    )}
                   </div>
                   <div>
                     <input
@@ -476,122 +488,133 @@ const Home = () => {
                       id="last_name"
                       className="bg-gray-50 ml-10 border-gray-300 text-sm rounded-md focus:ring-blue-500 focus:border-blue-500 block p-2.5 dark:placeholder-gray-400 dark:text-black dark:focus:ring-blue-500 dark:focus:border-blue-500"
                       placeholder="Last Name"
-                      onKeyDown={e => checkIsStringLetter(e)}
-                      required
+                      onKeyDown={(e) => checkIsStringLetter(e)}
                     />
                     {errors.last_name && (
-                      <span className="text-red-500">
-                        This field is required
+                      <span className="text-red-500 text-xs ml-12">
+                        * Last name is required
                       </span>
                     )}
                   </div>
                 </div>
               </div>
-              <hr className="my-6 border-gray-300 mt-10" />
-              <div className="flex w-full">
-                <div className="bg-white w-full  rounded-lg">
-                  <h2 className="text-xl font-bold mb-1 text-[#2C7DD6]">
-                    Basic Refugee Registration
-                  </h2>
+            </div>
 
-                  <div className="flex flex-row mt-10 space-x-14 w-full ">
-                    <section className="w-1/2 flex  flex-row space-x-14">
-                      <div className="flex flex-row items-center self-start">
-                        <div>
-                          <BsPersonStanding className="text-[#2C7FE0]" />
-                        </div>
-                        <div>
-                          <BsPersonStandingDress className="text-[#2C7FE0]" />
-                        </div>
-                        <div className="ml-3">Gender *</div>
-                      </div>
+            <hr className="my-6 border-gray-300 mt-10" />
+            <div className="flex w-full">
+              <div className="bg-white w-full  rounded-lg">
+                <h2 className="text-xl font-bold mb-1 text-[#2C7DD6]">
+                  Basic Refugee Registration
+                </h2>
 
-                      <div className=" w-1/2 flex items-start justify-center">
-                        <select
-                          {...register("gender_id", {
-                            required: true,
-                          })}
-                          className="ml-8  px-4 pt-2 pb-3 w-[12rem] bg-gray-100 justify-self-center rounded-lg "
-                        >
-                          {queryGender?.data?.data?.map(
-                            (option: { name: string; id: string }) => (
-                              <option
-                                value={option.id}
-                                key={option.id}
-                                className="px-4"
-                              >
-                                {option.name}
-                              </option>
-                            )
-                          )}
-                        </select>
-                      </div>
-                    </section>
-
-                    <div className="flex flex-row items-start ">
+                <div className="flex flex-row mt-10 space-x-14 w-full ">
+                  <section className="w-1/2 flex  flex-row space-x-14">
+                    <div className="flex flex-row items-center self-start">
                       <div>
-                        <IoCalendarOutline className="text-[#2C7FE0] mt-1 w-5 h-5" />
+                        <BsPersonStanding className="text-[#2C7FE0]" />
                       </div>
-                      <div className="flex flex-col ml-2">
-                        <div className="text-[15px] font-bold text-gray-500">
-                          Date of Birth *
-                        </div>
-                        <div className="text-gray-500 ">
-                          Enter Applicant’s Birth Date *
-                        </div>
+                      <div>
+                        <BsPersonStandingDress className="text-[#2C7FE0]" />
                       </div>
+                      <div className="ml-3">Gender *</div>
                     </div>
-                    <div className="relative w-[14em] ml-3">
-                      <input
-                        id="datepicker-format"
-                        datepicker-format="mm-dd-yyyy"
-                        type="date"
-                        {...register("date_of_birth", {
+
+                    <div className=" w-1/2 flex items-start justify-center">
+                      <select
+                        {...register("gender_id", {
                           required: true,
                         })}
-                        className=" w-46 px-6   bg-gray-50 border border-gray-300 text-gray-900 text-sm rounded-lg focus:ring-blue-500 focus:border-blue-500 block w-full p-2.5 dark:placeholder-gray-400 dark:focus:ring-blue-500 dark:focus:border-blue-500"
-                        placeholder="Select date"
-                      />
+                        className="ml-8  px-4 pt-2 pb-3 w-[12rem] bg-gray-100 justify-self-center rounded-lg "
+                      >
+                        {queryGender?.data?.data?.map(
+                          (option: { name: string; id: string }) => (
+                            <option
+                              value={option.id}
+                              key={option.id}
+                              className="px-4"
+                            >
+                              {option.name}
+                            </option>
+                          )
+                        )}
+                      </select>
+                    </div>
+                  </section>
+
+                  <section className="flex justify-between w-1/2">
+                  <div className="flex flex-row items-start ">
+                    <div>
+                      <IoCalendarOutline className="text-[#2C7FE0] mt-1 w-5 h-5" />
+                    </div>
+                    <div className="flex flex-col ml-2">
+                      <div className="text-[15px] font-bold text-gray-500">
+                        Date of Birth *
+                      </div>
+                    </div>
+                  </div>
+                  <div className="relative w-1/2 ml-3 flex justify-center">
+                    <input
+                      id="datepicker-format"
+                      datepicker-format="mm-dd-yyyy"
+                      type="date"
+                      {...register("date_of_birth", {
+                        required: "DOB is required",
+                        validate: validateMinAge,
+                      })}
+                      className=" w-[14rem] px-6   bg-gray-50 border border-gray-300 text-gray-900 text-sm rounded-lg focus:ring-blue-500 focus:border-blue-500 block p-2.5 dark:placeholder-gray-400 dark:focus:ring-blue-500 dark:focus:border-blue-500"
+                      placeholder="Select date"
+                      onChange={() =>
+                        console.log({ dob: errors.date_of_birth })
+                      }
+                    />
+                    {errors.date_of_birth && (
+                      <span className="text-red-500 text-xs">
+                        * {errors.date_of_birth.message}
+                      </span>
+                    )}
+                  </div>
+</section>
+                  
+                </div>
+              </div>
+            </div>
+
+            <div className="flex flex-row mt-10 space-x-14 w-full">
+              <section className="w-1/2 flex  flex-row space-x-14">
+                <div className="flex flex-row">
+                  <FaPhone className=" text-[#2C7FE0] mt-1" />
+
+                  <div className="flex flex-col ml-2">
+                    <div className="ml-3">Nationality*</div>
+                    <div className="text-gray-300 text-[12px] pl-2">
+                      Country of Birth *
                     </div>
                   </div>
                 </div>
-              </div>
+                <div className=" w-1/2 flex items-start justify-center">
+                  <select
+                    {...register("nationality_id", {
+                      required: true,
+                    })}
+                    className="w-[12rem] px-4 pt-2 pb-3 bg-gray-100 justify-self-center rounded-lg "
+                  >
+                    {queryNationality?.data?.data?.map(
+                      (option: { name: string; id: string }) => (
+                        <option
+                          value={option.id}
+                          key={option.id}
+                          className="px-4"
+                        >
+                          {option.name}
+                        </option>
+                      )
+                    )}
+                  </select>
+                </div>
+              </section>
 
-              <div className="flex flex-row mt-10 space-x-14 w-full">
-                <section className="w-1/2 flex  flex-row space-x-14">
-                  <div className="flex flex-row">
-                    <FaPhone className=" text-[#2C7FE0] mt-1" />
-
-                    <div className="flex flex-col ml-2">
-                      <div className="ml-3">Nationality*</div>
-                      <div className="text-gray-300 text-[12px] pl-2">
-                        Country of Birth *
-                      </div>
-                    </div>
-                  </div>
-                  <div className=" w-1/2 flex items-start justify-center">
-                    <select
-                      {...register("nationality_id", {
-                        required: true,
-                      })}
-                      className="w-[12rem] px-4 pt-2 pb-3 bg-gray-100 justify-self-center rounded-lg "
-                    >
-                      {queryNationality?.data?.data?.map(
-                        (option: { name: string; id: string }) => (
-                          <option
-                            value={option.id}
-                            key={option.id}
-                            className="px-4"
-                          >
-                            {option.name}
-                          </option>
-                        )
-                      )}
-                    </select>
-                  </div>
-                </section>
-
-                <div className="flex flex-row  ">
+              <section className="flex justify-start">
+                <div className="flex flex-row ">
                   <div>
                     <BsPersonStanding className=" text-[#2C7FE0] mt-1" />
                   </div>
@@ -607,7 +630,7 @@ const Home = () => {
                     </div>
                   </div>
                 </div>
-                <div className="flex items-start justify-center ">
+                <div className="flex items-start justify-center border w-1/2">
                   <select
                     {...register("marital_status_id", {
                       required: true,
@@ -627,307 +650,331 @@ const Home = () => {
                     )}
                   </select>
                 </div>
-              </div>
+              </section>
+            </div>
 
-              <div className="flex flex-row mt-10 space-x-14 w-full">
-                <div className="w-1/2 flex justify-start items-start flex-row ">
-                  <MdDashboard className="text-[#2C7FE0] mt-1" />
-                  <div className="ml-3">
-                    <div>Start date *</div>
-                  </div>
-                  <div className="w-1/2 justify-end  flex flex-row  space-x-4 ml-3">
-                    <input
-                      type="date"
-                      {...register("start_date", {
-                        required: true,
-                      })}
-                      className="bg-gray-50 border border-gray-300 text-gray-900 text-sm rounded-lg w-[14rem]  focus:ring-blue-500 focus:border-blue-500 block  p-2.5"
-                      placeholder="Year"
-                    />
-                    {errors.start_date && (
-                      <span className="text-red-500">
-                        This field is required
-                      </span>
-                    )}
-                  </div>
+            <div className="flex flex-row mt-10 space-x-14 w-full">
+              <div className="w-1/2 flex justify-start items-start flex-row ">
+                <MdDashboard className="text-[#2C7FE0] mt-1" />
+                <div className="ml-3">
+                  <div>Start date *</div>
                 </div>
-
-                <div className="flex flex-row items-center mb-2">
-                  <div className="flex flex-row items-center">
-                    <MdDashboard className="text-[#2C7FE0] mt-1" />
-                    <div className="ml-3">
-                      <div>service issued number *</div>
-                    </div>
-                  </div>
-                  <div className="flex flex-row  space-x-4 ml-3">
-                    <input
-                      type="text"
-                      {...register("service_issued_id_number", {
-                        required: true,
-                      })}
-                      id="service_issued_id_number"
-                      className="bg-gray-50 ml-10 border-gray-300 text-sm rounded-md focus:ring-blue-500 focus:border-blue-500 block p-2.5 dark:placeholder-gray-400 dark:text-black dark:focus:ring-blue-500 dark:focus:border-blue-500"
-                      placeholder="Service issue number"
-                    />
-                  </div>
+                <div className="ml-28 flex flex-col items-start  justify-center ">
+                  <input
+                    type="date"
+                    {...register("start_date", {
+                      required: true,
+                    })}
+                    className="bg-gray-50 border border-gray-300 text-gray-900 text-sm rounded-lg w-[14rem]  focus:ring-blue-500 focus:border-blue-500 block  p-2.5"
+                    placeholder="Year"
+                  />
+                  {errors.date_of_birth && (
+                    <span className="text-red-500 text-xs mt-2">
+                      * DOB is required
+                    </span>
+                  )}
                 </div>
               </div>
 
-              <div className="flex flex-row mt-10 space-x-14">
-                <div className="flex flex-row w-1/2 ">
-                  <div className="flex flex-row">
-                    <MdDashboard className="text-[#2C7FE0] mt-1" />
-                    <div className="ml-3">
-                      <div>
-                        Proof of Ethiopian <br />
-                        Spouse / Child
-                      </div>
-                      <div className="text-gray-300 text-[12px] mt-3">
-                        Accepted File types
-                      </div>
-                      <div className="flex flex-row ml-2">
-                        <MdPushPin className="text-gray-300 text-[12px] mt-1" />
-                        <span className="text-gray-300 text-[12px]">
-                          pdf | doc
-                        </span>
-                      </div>
-                      <div className="flex flex-row ml-2">
-                        <MdPushPin className="text-gray-300 text-[12px] mt-1" />
-                        <span className="text-gray-300 text-[12px]">
-                          jpeg | jpg | png
-                        </span>
-                      </div>
-                    </div>
-                  </div>
-
-                  <div className="flex flex-row w-1/2  justify-center space-x-4 ml-6">
-                    <div className="flex flex-col items-center ">
-                      <div className="flex items-center justify-center w-full">
-                        {!selectedDocument?.file?.name ? (
-                          <label className="flex flex-col items-center justify-center w-full rounded-lg cursor-pointer bg-[#E5EDF5] hover:bg-gray-100 dark:border-gray-600 dark:hover:border-gray-500 dark:hover:bg-gray-600">
-                            <div className="flex flex-col items-center justify-center pt-5 pb-6">
-                              <svg
-                                className="w-8 h-8 mb-4 text-gray-500 dark:text-gray-400"
-                                aria-hidden="true"
-                                xmlns="http://www.w3.org/2000/svg"
-                                fill="none"
-                                viewBox="0 0 20 16"
-                              >
-                                <path
-                                  stroke="currentColor"
-                                  strokeLinecap="round"
-                                  strokeLinejoin="round"
-                                  strokeWidth="2"
-                                  d="M13 13h3a3 3 0 0 0 0-6h-.025A5.56 5.56 0 0 0 16 6.5 5.5 5.5 0 0 0 5.207 5.021C5.137 5.017 5.071 5 5 5a4 4 0 0 0 0 8h2.167M10 15V6m0 0L8 8m2-2 2 2"
-                                />
-                              </svg>
-                              <p className="mb-2 text-sm text-gray-300 font-[12px]">
-                                Click to choose document type
-                              </p>
-                            </div>
-                            <input
-                              id="dropzone-file"
-                              type="file"
-                              name="preferred_job_title" // This will be used to map the file to a form field
-                              className="hidden"
-                              onChange={handleFileChange} // Handle file selection
-                            />
-                          </label>
-                        ) : (
-                          // Display selected document card with remove icon
-                          <div className="flex flex-row items-center bg-gray-200 p-3 rounded-lg w-full">
-                            <div className="flex flex-row items-center">
-                              <svg
-                                className="w-6 h-6 text-gray-500 mr-2"
-                                xmlns="http://www.w3.org/2000/svg"
-                                fill="none"
-                                viewBox="0 0 20 16"
-                              >
-                                <path
-                                  stroke="currentColor"
-                                  strokeLinecap="round"
-                                  strokeLinejoin="round"
-                                  strokeWidth="2"
-                                  d="M13 13h3a3 3 0 0 0 0-6h-.025A5.56 5.56 0 0 0 16 6.5 5.5 5.5 0 0 0 5.207 5.021C5.137 5.017 5.071 5 5 5a4 4 0 0 0 0 8h2.167M10 15V6m0 0L8 8m2-2 2 2"
-                                />
-                              </svg>
-                              <span className="text-sm text-gray-700">
-                                {selectedDocument?.file?.name}
-                              </span>
-                            </div>
-                            <AiOutlineDelete
-                              className="text-red-500 ml-auto cursor-pointer"
-                              size={20}
-                              onClick={handleRemoveDocument} // Remove selected document
-                            />
-                          </div>
-                        )}
-                      </div>
-                    </div>
-                  </div>
-                </div>
-
-                <div className="flex flex-row items-center mb-2 w-1/2 pl-8">
-                  <div className="flex flex-row items-center w-2/5">
-                    <MdDashboard className="text-[#2C7FE0] mt-1" />
-                    <div className="ml-3">
-                      <div>Service Issued ID</div>
-                      <div className="text-gray-300 text-[12px] mt-3">
-                        Accepted File types
-                      </div>
-                      <div className="flex flex-row ml-2">
-                        <MdPushPin className="text-gray-300 text-[12px] mt-1" />
-                        <span className="text-gray-300 text-[12px]">
-                          pdf | doc
-                        </span>
-                      </div>
-                      <div className="flex flex-row ml-2">
-                        <MdPushPin className="text-gray-300 text-[12px] mt-1" />
-                        <span className="text-gray-300 text-[12px]">
-                          jpeg | jpg | png
-                        </span>
-                      </div>
-                    </div>
-                  </div>
-                  <div className="flex flex-row  w-1/2   space-x-4">
-                    {!selectedServiceDocument?.file?.name ? (
-                      <label className="flex flex-col items-center justify-center w-full rounded-lg cursor-pointer bg-[#E5EDF5] hover:bg-gray-100 dark:border-gray-600 dark:hover:border-gray-500 dark:hover:bg-gray-600">
-                        <div className="flex flex-col items-center justify-center pt-5 pb-6">
-                          <svg
-                            className="w-8 h-8 mb-4 text-gray-500 dark:text-gray-400"
-                            aria-hidden="true"
-                            xmlns="http://www.w3.org/2000/svg"
-                            fill="none"
-                            viewBox="0 0 20 16"
-                          >
-                            <path
-                              stroke="currentColor"
-                              strokeLinecap="round"
-                              strokeLinejoin="round"
-                              strokeWidth="2"
-                              d="M13 13h3a3 3 0 0 0 0-6h-.025A5.56 5.56 0 0 0 16 6.5 5.5 5.5 0 0 0 5.207 5.021C5.137 5.017 5.071 5 5 5a4 4 0 0 0 0 8h2.167M10 15V6m0 0L8 8m2-2 2 2"
-                            />
-                          </svg>
-                          <p className="mb-2 text-sm text-gray-300 font-[12px]">
-                            Click to choose document type
-                          </p>
-                        </div>
-                        <input
-                          id="dropzone-file"
-                          type="file"
-                          name="preferred_job_title" // This will be used to map the file to a form field
-                          className="hidden"
-                          required
-                          onChange={handleServiceFileChange} // Handle file selection
-                        />
-                      </label>
-                    ) : (
-                      // Display selected document card with remove icon
-                      <div className="flex flex-row items-center bg-gray-200 p-3 rounded-lg w-full">
-                        <div className="flex flex-row items-center">
-                          <svg
-                            className="w-6 h-6 text-gray-500 mr-2"
-                            xmlns="http://www.w3.org/2000/svg"
-                            fill="none"
-                            viewBox="0 0 20 16"
-                          >
-                            <path
-                              stroke="currentColor"
-                              strokeLinecap="round"
-                              strokeLinejoin="round"
-                              strokeWidth="2"
-                              d="M13 13h3a3 3 0 0 0 0-6h-.025A5.56 5.56 0 0 0 16 6.5 5.5 5.5 0 0 0 5.207 5.021C5.137 5.017 5.071 5 5 5a4 4 0 0 0 0 8h2.167M10 15V6m0 0L8 8m2-2 2 2"
-                            />
-                          </svg>
-                          <span className="text-sm text-gray-700">
-                            {selectedServiceDocument?.file.name}
-                          </span>
-                        </div>
-                        <AiOutlineDelete
-                          className="text-red-500 ml-auto cursor-pointer"
-                          size={20}
-                          onClick={handleRemoveServiceDocument} // Remove selected document
-                        />
-                      </div>
-                    )}
-                  </div>
-                </div>
-              </div>
-              <div className="flex flex-row items-center mt-10 space-x-14">
-                <section className="w-1/2 flex">
-                  <div className="flex flex-row ">
-                    <MdDashboard className="text-[#2C7FE0] mt-1" />
-                    <div className="ml-3">
-                      <div>service issued *</div>
-                    </div>
-                  </div>
-                  <div className="flex flex-row  space-x-4 ml-10 justify-center w-1/2">
-                    <div className="flex flex-col items-center">
-                      <input
-                        type="date"
-                        {...register("service_issued_id_date_of_issue", {
-                          required: true,
-                        })}
-                        className="bg-gray-50 border border-gray-300 text-gray-900 text-sm rounded-lg w-[14rem] focus:ring-blue-500 focus:border-blue-500 block p-2.5"
-                        placeholder="Year"
-                      />
-                      {errors.service_issued_id_date_of_issue && (
-                        <span className="text-red-500">
-                          This field is required
-                        </span>
-                      )}
-                    </div>
-                  </div>
-                </section>
-
+              <div className="flex flex-row items-center mb-2">
                 <div className="flex flex-row items-center">
                   <MdDashboard className="text-[#2C7FE0] mt-1" />
                   <div className="ml-3">
+                    <div>service issued number *</div>
+                  </div>
+                </div>
+                <div className="flex flex-col   ml-3">
+                  <input
+                    type="text"
+                    {...register("service_issued_id_number", {
+                      required: true,
+                    })}
+                    id="service_issued_id_number"
+                    className="bg-gray-50 ml-10 border-gray-300 text-sm rounded-md focus:ring-blue-500 focus:border-blue-500 block p-2.5 dark:placeholder-gray-400 dark:text-black dark:focus:ring-blue-500 dark:focus:border-blue-500"
+                    placeholder="Service issue number"
+                  />
+                  {errors.service_issued_id_number && (
+                    <span className="text-red-500 text-xs mt-2 ml-10">
+                      * Number is required
+                    </span>
+                  )}
+                </div>
+              </div>
+            </div>
+
+            <div className="flex flex-row mt-10 space-x-14">
+              <div className="flex flex-row w-1/2 ">
+                <div className="flex flex-row">
+                  <MdDashboard className="text-[#2C7FE0] mt-1" />
+                  <div className="ml-3">
                     <div>
-                      service issued id * <br />
-                      date of expiry
+                      Proof of Ethiopian <br />
+                      Spouse / Child
+                    </div>
+                    <div className="text-gray-300 text-[12px] mt-3">
+                      Accepted File types
+                    </div>
+                    <div className="flex flex-row ml-2">
+                      <MdPushPin className="text-gray-300 text-[12px] mt-1" />
+                      <span className="text-gray-300 text-[12px]">
+                        pdf | doc
+                      </span>
+                    </div>
+                    <div className="flex flex-row ml-2">
+                      <MdPushPin className="text-gray-300 text-[12px] mt-1" />
+                      <span className="text-gray-300 text-[12px]">
+                        jpeg | jpg | png
+                      </span>
                     </div>
                   </div>
                 </div>
-                <div className="flex flex-row  space-x-4 ml-">
-                  <div className="flex flex-col items-center ml-9">
+
+                <div className="flex flex-row w-1/2  justify-center space-x-4 ml-6">
+                  <div className="flex flex-col items-center ">
+                    <div className="flex items-center justify-center w-full">
+                      {!selectedDocument?.file?.name ? (
+                        <label className="flex flex-col items-center justify-center w-full rounded-lg cursor-pointer bg-[#E5EDF5] hover:bg-gray-100 dark:border-gray-600 dark:hover:border-gray-500 dark:hover:bg-gray-600">
+                          <div className="flex flex-col items-center justify-center pt-5 pb-6">
+                            <svg
+                              className="w-8 h-8 mb-4 text-gray-500 dark:text-gray-400"
+                              aria-hidden="true"
+                              xmlns="http://www.w3.org/2000/svg"
+                              fill="none"
+                              viewBox="0 0 20 16"
+                            >
+                              <path
+                                stroke="currentColor"
+                                strokeLinecap="round"
+                                strokeLinejoin="round"
+                                strokeWidth="2"
+                                d="M13 13h3a3 3 0 0 0 0-6h-.025A5.56 5.56 0 0 0 16 6.5 5.5 5.5 0 0 0 5.207 5.021C5.137 5.017 5.071 5 5 5a4 4 0 0 0 0 8h2.167M10 15V6m0 0L8 8m2-2 2 2"
+                              />
+                            </svg>
+                            <p className="mb-2 text-sm text-gray-300 font-[12px]">
+                              Click to choose document type
+                            </p>
+                          </div>
+                          <input
+                            id="dropzone-file"
+                            type="file"
+                            name="preferred_job_title" // This will be used to map the file to a form field
+                            className="hidden"
+                            onChange={handleFileChange} // Handle file selection
+                            required={getValues().first_name ? true : false}
+                          />
+                        </label>
+                      ) : (
+                        // Display selected document card with remove icon
+                        <div className="flex flex-row items-center bg-gray-200 p-3 rounded-lg w-full">
+                          <div className="flex flex-row items-center">
+                            <svg
+                              className="w-6 h-6 text-gray-500 mr-2"
+                              xmlns="http://www.w3.org/2000/svg"
+                              fill="none"
+                              viewBox="0 0 20 16"
+                            >
+                              <path
+                                stroke="currentColor"
+                                strokeLinecap="round"
+                                strokeLinejoin="round"
+                                strokeWidth="2"
+                                d="M13 13h3a3 3 0 0 0 0-6h-.025A5.56 5.56 0 0 0 16 6.5 5.5 5.5 0 0 0 5.207 5.021C5.137 5.017 5.071 5 5 5a4 4 0 0 0 0 8h2.167M10 15V6m0 0L8 8m2-2 2 2"
+                              />
+                            </svg>
+                            <span className="text-sm text-gray-700">
+                              {selectedDocument?.file?.name}
+                            </span>
+                          </div>
+                          <AiOutlineDelete
+                            className="text-red-500 ml-auto cursor-pointer"
+                            size={20}
+                            onClick={handleRemoveDocument} // Remove selected document
+                          />
+                        </div>
+                      )}
+                    </div>
+                  </div>
+                </div>
+              </div>
+
+              <div className="flex flex-row items-center mb-2 w-1/2 pl-8">
+                <div className="flex flex-row items-center w-2/5">
+                  <MdDashboard className="text-[#2C7FE0] mt-1" />
+                  <div className="ml-3">
+                    <div>Service Issued ID</div>
+                    <div className="text-gray-300 text-[12px] mt-3">
+                      Accepted File types
+                    </div>
+                    <div className="flex flex-row ml-2">
+                      <MdPushPin className="text-gray-300 text-[12px] mt-1" />
+                      <span className="text-gray-300 text-[12px]">
+                        pdf | doc
+                      </span>
+                    </div>
+                    <div className="flex flex-row ml-2">
+                      <MdPushPin className="text-gray-300 text-[12px] mt-1" />
+                      <span className="text-gray-300 text-[12px]">
+                        jpeg | jpg | png
+                      </span>
+                    </div>
+                  </div>
+                </div>
+                <div className="flex flex-row  w-1/2   space-x-4">
+                  {!selectedServiceDocument?.file?.name ? (
+                    <label className="flex flex-col items-center justify-center w-full rounded-lg cursor-pointer bg-[#E5EDF5] hover:bg-gray-100 dark:border-gray-600 dark:hover:border-gray-500 dark:hover:bg-gray-600">
+                      <div className="flex flex-col items-center justify-center pt-5 pb-6">
+                        <svg
+                          className="w-8 h-8 mb-4 text-gray-500 dark:text-gray-400"
+                          aria-hidden="true"
+                          xmlns="http://www.w3.org/2000/svg"
+                          fill="none"
+                          viewBox="0 0 20 16"
+                        >
+                          <path
+                            stroke="currentColor"
+                            strokeLinecap="round"
+                            strokeLinejoin="round"
+                            strokeWidth="2"
+                            d="M13 13h3a3 3 0 0 0 0-6h-.025A5.56 5.56 0 0 0 16 6.5 5.5 5.5 0 0 0 5.207 5.021C5.137 5.017 5.071 5 5 5a4 4 0 0 0 0 8h2.167M10 15V6m0 0L8 8m2-2 2 2"
+                          />
+                        </svg>
+                        <p className="mb-2 text-sm text-gray-300 font-[12px]">
+                          Click to choose document type
+                        </p>
+                      </div>
+                      <input
+                        id="dropzone-file"
+                        type="file"
+                        name="preferred_job_title" // This will be used to map the file to a form field
+                        className="hidden"
+                        onChange={handleServiceFileChange} // Handle file selection
+                        required={getValues().first_name ? true : false}
+                      />
+                    </label>
+                  ) : (
+                    // Display selected document card with remove icon
+                    <div className="flex flex-row items-center bg-gray-200 p-3 rounded-lg w-full">
+                      <div className="flex flex-row items-center">
+                        <svg
+                          className="w-6 h-6 text-gray-500 mr-2"
+                          xmlns="http://www.w3.org/2000/svg"
+                          fill="none"
+                          viewBox="0 0 20 16"
+                        >
+                          <path
+                            stroke="currentColor"
+                            strokeLinecap="round"
+                            strokeLinejoin="round"
+                            strokeWidth="2"
+                            d="M13 13h3a3 3 0 0 0 0-6h-.025A5.56 5.56 0 0 0 16 6.5 5.5 5.5 0 0 0 5.207 5.021C5.137 5.017 5.071 5 5 5a4 4 0 0 0 0 8h2.167M10 15V6m0 0L8 8m2-2 2 2"
+                          />
+                        </svg>
+                        <span className="text-sm text-gray-700">
+                          {selectedServiceDocument?.file.name}
+                        </span>
+                      </div>
+                      <AiOutlineDelete
+                        className="text-red-500 ml-auto cursor-pointer"
+                        size={20}
+                        onClick={handleRemoveServiceDocument} // Remove selected document
+                      />
+                    </div>
+                  )}
+                </div>
+              </div>
+            </div>
+
+            <div className="flex flex-row items-center mt-10 space-x-14">
+              <section className="w-1/2 flex">
+                <div className="flex flex-row ">
+                  <MdDashboard className="text-[#2C7FE0] mt-1" />
+                  <div className="ml-3">
+                    <div>service issued *</div>
+                  </div>
+                </div>
+                <div className="flex flex-row  space-x-4 ml-10 justify-center w-1/2">
+                  <div className="flex flex-col items-start">
                     <input
                       type="date"
-                      {...register("service_issued_id_date_of_expiry", {
+                      {...register("service_issued_id_date_of_issue", {
                         required: true,
                       })}
                       className="bg-gray-50 border border-gray-300 text-gray-900 text-sm rounded-lg w-[14rem] focus:ring-blue-500 focus:border-blue-500 block p-2.5"
                       placeholder="Year"
                     />
-                    {errors.service_issued_id_date_of_expiry && (
-                      <span className="text-red-500">
-                        This field is required
+
+                    {errors.service_issued_id_date_of_issue && (
+                      <span className="text-red-500 text-xs mt-2">
+                        * Date is required
                       </span>
                     )}
                   </div>
                 </div>
-              </div>
-              <div className="flex flex-row mt-10">
-                <section className="w-1/2 flex">
-                  <div className="flex flex-row items-center">
-                    <MdDashboard className="text-[#2C7FE0] mt-1" />
-                    <div className="ml-3">
-                      <div>duration requested years *</div>
-                    </div>
-                  </div>
-                  <div className="flex flex-row  space-x-4 ml-3">
-                    <input
-                      type="number"
-                      {...register("duration_requested_years", {
-                        required: true,
-                      })}
-                      id="duration_requested_years"
-                      className="bg-gray-50 ml-10 border-gray-300 text-sm rounded-md focus:ring-blue-500 focus:border-blue-500 block p-2.5 dark:placeholder-gray-400 dark:text-black dark:focus:ring-blue-500 dark:focus:border-blue-500"
-                      placeholder="duration years"
-                    />
-                  </div>
-                </section>
+              </section>
 
+              <div className="flex flex-row items-center">
+                <MdDashboard className="text-[#2C7FE0] mt-1" />
+                <div className="ml-3">
+                  <div>
+                    service issued id * <br />
+                    date of expiry
+                  </div>
+                </div>
+              </div>
+              <div className="flex flex-row  space-x-4 ml-">
+                <div className="flex flex-col items-start ml-9">
+                  <input
+                    type="date"
+                    {...register("service_issued_id_date_of_expiry", {
+                      required: "Date of expiry is required",
+                      validate: (value) => {
+                        if (issueDate && value) {
+                          return (
+                            new Date(issueDate) < new Date(value) ||
+                            "Expiry date must be after the issue date"
+                          );
+                        }
+                        return true;
+                      },
+                    })}
+                    className="bg-gray-50 border border-gray-300 text-gray-900 text-sm rounded-lg w-[14rem] focus:ring-blue-500 focus:border-blue-500 block p-2.5"
+                    placeholder="Year"
+                  />
+                  {errors.service_issued_id_date_of_expiry && (
+                    <span className="text-red-500 text-xs mt-2">
+                      {errors.service_issued_id_date_of_expiry.message}
+                    </span>
+                  )}
+                </div>
+              </div>
+            </div>
+            <div className="flex flex-row items-start mt-10">
+              <section className="w-1/2 flex">
+                <div className="flex flex-row items-center">
+                  <MdDashboard className="text-[#2C7FE0] mt-1" />
+                  <div className="ml-3">
+                    <div>duration requested years *</div>
+                  </div>
+                </div>
+                <div className="flex flex-col  space-x-4 ml-3">
+                  <input
+                    type="number"
+                    {...register("duration_requested_years", {
+                      required: true,
+                    })}
+                    id="duration_requested_years"
+                    className="bg-gray-50 ml-10 border-gray-300 text-sm rounded-md focus:ring-blue-500 focus:border-blue-500 block p-2.5 dark:placeholder-gray-400 dark:text-black dark:focus:ring-blue-500 dark:focus:border-blue-500"
+                    placeholder="duration years"
+                  />
+                  {errors.duration_requested_years && (
+                    <span className="text-red-500 text-xs mt-2 pl-7">
+                      * Duration is required
+                    </span>
+                  )}
+                </div>
+              </section>
+
+              <section className="flex flex-row items-start mt-10">
                 <div className="flex flex-row items-center ml-14">
                   <MdDashboard className="text-[#2C7FE0] mt-1" />
                   <div className="ml-3">
@@ -938,24 +985,19 @@ const Home = () => {
                   {...register("is_spouse_or_child_citizen_et", {
                     required: "This field is required",
                   })}
-                  className="ml-14  w-[12rem] px-4 pt-2 pb-3  px-4 bg-gray-100  rounded-lg "
+                  className="ml-14  w-[12rem] px-4 pt-2 pb-3  bg-gray-100  rounded-lg "
+                  onChange={() => setchild((prev) => !prev)}
                 >
-                  <option
-                    value="true"
-                    className="px-4"
-                    onClick={() => setchild(true)}
-                  >
+                  <option value="true" className="px-4">
                     True
                   </option>
-                  <option
-                    value="false"
-                    className="px-4"
-                    onClick={() => setchild(false)}
-                  >
+                  <option value="false" className="px-4">
                     False
                   </option>
                 </select>
-              </div>
+              </section>
+            </div>
+            {child && (
               <div className="flex flex-row items-start  mt-10">
                 <section className="w-1/2 flex">
                   <div className="flex flex-row items-center ">
@@ -988,7 +1030,7 @@ const Home = () => {
                       <div>spouse/child_name *</div>
                     </div>
                   </div>
-                  <div className="flex flex-row  space-x-4 ml-3">
+                  <div className="flex flex-col  space-x-4 ml-3">
                     <input
                       type="text"
                       {...register("spouse_or_child_name", {
@@ -996,154 +1038,328 @@ const Home = () => {
                       })}
                       className="bg-gray-50 border border-gray-300 text-gray-900 text-sm rounded-lg focus:ring-blue-500 focus:border-blue-500 block w-full p-2.5"
                       placeholder="Year"
-                      onKeyDown={e => checkIsStringLetter(e)}
+                      onKeyDown={(e) => checkIsStringLetter(e)}
                     />
                     {errors.spouse_or_child_name && (
-                      <span className="text-red-500">
-                        This field is required
+                      <span className="text-red-500 text-xs mt-2">
+                        * Name is required
                       </span>
                     )}
                   </div>
                 </div>
               </div>
+            )}
 
-              <hr className="my-4 border-t border-gray-300 mt-10" />
-              <div className="mt-10">
-                <h2 className="text-md font-semibold mb-2 text-[#2C7DD6]">
-                  Educational Information
-                </h2>
-              </div>
+            <hr className="my-4 border-t border-gray-300 mt-10" />
+            <div className="mt-10">
+              <h2 className="text-md font-semibold mb-2 text-[#2C7DD6]">
+                Educational Information
+              </h2>
+            </div>
 
-              <div className="flex flex-row mt-10">
-                <section className="w-1/2 flex">
+            <div className="flex flex-row mt-10">
+              <section className="w-1/2 flex">
+                <div className="flex flex-row">
+                  <MdDashboard className="text-[#2C7FE0] mt-1" />
+                  <div className="flex flex-col ml-2">
+                    <div className="ml-3">Institute Name *</div>
+                  </div>
+                </div>
+                <div className="flex flex-col items-start ml-32">
+                  <input
+                    type="text"
+                    {...register("institute_name", { required: true })}
+                    className="bg-gray-50 border border-gray-300 text-gray-900 text-sm rounded-lg focus:ring-blue-500 focus:border-blue-500 block w-full p-2.5"
+                    placeholder="Institute"
+                    onKeyDown={(e) => checkIsStringLetter(e)}
+                  />
+
+                  {errors.institute_name && (
+                    <span className="text-red-500 text-xs mt-2">
+                      * Institute name is required
+                    </span>
+                  )}
+                </div>
+              </section>
+              <section className="w-1/2 flex">
+                <div className="flex flex-row ml-14">
+                  <MdDashboard className="text-[#2C7FE0] mt-1" />
+                  <div className="flex flex-col">
+                    <div className="text-[15px] font-bold text-gray-500 ml-2">
+                      Field of Study *
+                    </div>
+                  </div>
+                </div>
+                <div className="flex flex-col items-start ml-10">
+                  <input
+                    type="text"
+                    {...register("field_of_study", { required: true })}
+                    className="bg-gray-50 border border-gray-300 text-gray-900 text-sm rounded-lg focus:ring-blue-500 focus:border-blue-500 block w-full p-2.5"
+                    placeholder="Field"
+                    onKeyDown={(e) => checkIsStringLetter(e)}
+                  />
+                  {errors.field_of_study && (
+                    <span className="text-red-500 text-xs mt-2">
+                      * Field of study is required
+                    </span>
+                  )}
+                </div>
+              </section>
+            </div>
+
+            <div className="flex flex-row mt-10">
+              <section className="w-1/2 flex">
+                <div className="flex flex-row">
+                  <MdDashboard className="text-[#2C7FE0] mt-1" />
+                  <div className="flex flex-col ml-2">
+                    <div className="ml-3">Highest Education Level *</div>
+                  </div>
+                </div>
+                <div className="flex flex-col items-start ml-14">
+                  <input
+                    type="text"
+                    {...register("highest_level_of_education", {
+                      required: true,
+                    })}
+                    className="bg-gray-50 border border-gray-300 text-gray-900 text-sm rounded-lg focus:ring-blue-500 focus:border-blue-500 block w-full p-2.5"
+                    placeholder="Education"
+                  />
+                  {errors.highest_level_of_education && (
+                    <span className="text-red-500 text-xs mt-2">
+                      * Level is required
+                    </span>
+                  )}
+                </div>
+              </section>
+
+              <section className="w-1/2 flex">
+                <div className="flex flex-row ml-14">
+                  <MdDashboard className="text-[#2C7FE0] mt-1" />
+                  <div className="flex flex-col">
+                    <div className="text-[15px] font-bold text-gray-500 ml-2">
+                      Year Completed
+                    </div>
+                    <div className="font-[12px] text-gray-300">
+                      Enter Applicant’s *
+                      <br /> Year comp.
+                    </div>
+                  </div>
+                </div>
+                <div className="flex flex-col items-start ml-9">
+                  <input
+                    type="date"
+                    {...register("year_completed", { required: true })}
+                    className="bg-gray-50 border border-gray-300 text-gray-900 text-sm rounded-lg focus:ring-blue-500 focus:border-blue-500 block w-[14rem] p-2.5"
+                    placeholder="Year"
+                  />
+                  {errors.year_completed && (
+                    <span className="text-red-500 text-xs mt-2">
+                      * Date is required
+                    </span>
+                  )}
+                </div>
+              </section>
+            </div>
+
+            <div className="flex flex-row mt-10 space-x-14">
+              <section className="w-1/2 flex">
+                <div className="flex flex-row">
+                  <MdDashboard className="text-[#2C7FE0] mt-1" />
+                  <div className="ml-3 flex flex-col">
+                    <div>Education Documents</div>
+                    <div className="text-gray-300 text-[12px] mt-3">
+                      Accepted File types
+                    </div>
+                    <div className="flex flex-row ml-2">
+                      <MdPushPin className="text-gray-300 text-[12px] mt-1" />
+                      <div className="text-gray-300 text-[12px]">pdf | doc</div>
+                    </div>
+                    <div className="flex flex-row ml-2">
+                      <MdPushPin className="text-gray-300 text-[12px] mt-1" />
+                      <div className="text-gray-300 text-[12px]">
+                        jpeg | jpg | png
+                      </div>
+                    </div>
+                  </div>
+                </div>
+
+                <section className="w-1/2 ml-16">
+                  {!selectedEducationDocument?.file?.name ? (
+                    <label className="flex flex-col items-center justify-center  rounded-lg cursor-pointer bg-[#E5EDF5] hover:bg-gray-100 dark:border-gray-600 dark:hover:border-gray-500 dark:hover:bg-gray-600">
+                      <div className="flex flex-col items-center justify-center pt-5 pb-6">
+                        <svg
+                          className="w-8 h-8 mb-4 text-gray-500 dark:text-gray-400"
+                          aria-hidden="true"
+                          xmlns="http://www.w3.org/2000/svg"
+                          fill="none"
+                          viewBox="0 0 20 16"
+                        >
+                          <path
+                            stroke="currentColor"
+                            strokeLinecap="round"
+                            strokeLinejoin="round"
+                            strokeWidth="2"
+                            d="M13 13h3a3 3 0 0 0 0-6h-.025A5.56 5.56 0 0 0 16 6.5 5.5 5.5 0 0 0 5.207 5.021C5.137 5.017 5.071 5 5 5a4 4 0 0 0 0 8h2.167M10 15V6m0 0L8 8m2-2 2 2"
+                          />
+                        </svg>
+                        <p className="mb-2 text-sm text-gray-300 font-[12px]">
+                          Click to choose document type
+                        </p>
+                      </div>
+                      <input
+                        id="dropzone-file"
+                        type="file"
+                        name="preferred_job_title" // This will be used to map the file to a form field
+                        className="hidden"
+                        required={getValues().first_name ? true : false}
+                        onChange={handleEducationFileChange} // Handle file selection
+                      />
+                    </label>
+                  ) : (
+                    // Display selected document card with remove icon
+                    <div className="flex flex-row items-center bg-gray-200 p-3 rounded-lg w-full">
+                      <div className="flex flex-row items-center">
+                        <svg
+                          className="w-6 h-6 text-gray-500 mr-2"
+                          xmlns="http://www.w3.org/2000/svg"
+                          fill="none"
+                          viewBox="0 0 20 16"
+                        >
+                          <path
+                            stroke="currentColor"
+                            strokeLinecap="round"
+                            strokeLinejoin="round"
+                            strokeWidth="2"
+                            d="M13 13h3a3 3 0 0 0 0-6h-.025A5.56 5.56 0 0 0 16 6.5 5.5 5.5 0 0 0 5.207 5.021C5.137 5.017 5.071 5 5 5a4 4 0 0 0 0 8h2.167M10 15V6m0 0L8 8m2-2 2 2"
+                          />
+                        </svg>
+                        <span className="text-sm text-gray-700">
+                          {selectedEducationDocument?.file?.name}
+                        </span>
+                      </div>
+                      <AiOutlineDelete
+                        className="text-red-500 ml-auto cursor-pointer"
+                        size={20}
+                        onClick={handleRemoveEducationDocument} // Remove selected document
+                      />
+                    </div>
+                  )}
+                </section>
+              </section>
+
+              <section className="w-1/2 flex pl-6">
+                <div className="flex flex-row">
+                  <MdDashboard className="text-[#2C7FE0] mt-1" />
+                  <div className="ml-3 flex flex-col">
+                    <div>Date Received *</div>
+                  </div>
+                </div>
+                <div className="relative max-w-sm ml-3">
+                  <input
+                    id="datepicker-format"
+                    datepicker-format="mm-dd-yyyy"
+                    type="date"
+                    {...register("date_received", {
+                      required: true,
+                    })}
+                    className=" w-46 px-6   bg-gray-50 border border-gray-300 text-gray-900 text-sm rounded-lg focus:ring-blue-500 focus:border-blue-500 block w-[14rem] ml-16 p-2.5 dark:placeholder-gray-400 dark:focus:ring-blue-500 dark:focus:border-blue-500"
+                    placeholder="Select date"
+                  />
+                  {errors.date_received && (
+                    <span className="text-red-500 text-xs mt-2 ml-16">
+                      * Date is required
+                    </span>
+                  )}
+                </div>
+              </section>
+            </div>
+
+            <hr className="my-4 border-t border-gray-300 mt-10" />
+            <div className="mt-10">
+              <h2 className="text-md font-semibold mb-2 text-[#2C7DD6]">
+                Work Experience
+              </h2>
+            </div>
+
+            <div className="flex flex-row mt-10">
+              <section className="w-1/2 flex">
+                <div className="flex flex-row">
                   <div className="flex flex-row">
                     <MdDashboard className="text-[#2C7FE0] mt-1" />
-                    <div className="flex flex-col ml-2">
-                      <div className="ml-3">Institute Name *</div>
+                    <div className="flex flex-col ml-1">
+                      <div className="ml-3">Professional Skill</div>
                     </div>
                   </div>
-                  <div className="flex flex-col items-center ml-32">
+                  <div className="flex flex-col items-center">
                     <input
+                      {...register("professional_skill")}
                       type="text"
-                      {...register("institute_name", { required: true })}
-                      className="bg-gray-50 border border-gray-300 text-gray-900 text-sm rounded-lg focus:ring-blue-500 focus:border-blue-500 block w-full p-2.5"
-                      placeholder="Institute"
-                      onKeyDown={e => checkIsStringLetter(e)}
+                      className="bg-gray-50 border ml-[54%] border-gray-300 text-gray-900 text-sm rounded-lg focus:ring-blue-500 focus:border-blue-500 block p-2.5 dark:placeholder-gray-400 dark:text-black dark:focus:ring-blue-500 dark:focus:border-blue-500"
+                      placeholder="Skill"
+                      onKeyDown={(e) => checkIsStringLetter(e)}
                     />
-                    {errors.institute_name && (
-                      <span className="text-red-500">
-                        Institute name is required
+                    {errors.professional_skill && (
+                      <span className="text-red-500 text-xs mt-2 ml-16">
+                        * Skill is required
                       </span>
                     )}
                   </div>
-                </section>
-                <section className="w-1/2 flex">
-                  <div className="flex flex-row ml-14">
-                    <MdDashboard className="text-[#2C7FE0] mt-1" />
-                    <div className="flex flex-col">
-                      <div className="text-[15px] font-bold text-gray-500 ml-2">
-                        Field of Study *
-                      </div>
-                    </div>
+                </div>
+              </section>
+
+              <div className="flex flex-row ml-12">
+                <div>
+                  <MdDashboard className="text-[#2C7FE0] mt-1" />
+                </div>
+                <div className="flex flex-col">
+                  <div className="text-[15px] font-bold text-gray-500 ml-1">
+                    Preferred Job Title
                   </div>
-                  <div className="flex flex-col items-center ml-10">
-                    <input
-                      type="text"
-                      {...register("field_of_study", { required: true })}
-                      className="bg-gray-50 border border-gray-300 text-gray-900 text-sm rounded-lg focus:ring-blue-500 focus:border-blue-500 block w-full p-2.5"
-                      placeholder="Field"
-                      onKeyDown={e => checkIsStringLetter(e)}
-                    />
-                    {errors.field_of_study && (
-                      <span className="text-red-500">
-                        Field of study is required
-                      </span>
-                    )}
-                  </div>
-                </section>
+                </div>
+                <div className="flex flex-col items-center">
+                  <input
+                    {...register("preferred_job_title")}
+                    type="text"
+                    className="bg-gray-50 border ml-11 border-gray-300 text-gray-900 text-sm rounded-lg focus:ring-blue-500 focus:border-blue-500 block p-2.5 dark:placeholder-gray-400 dark:text-black dark:focus:ring-blue-500 dark:focus:border-blue-500"
+                    placeholder="Job Title"
+                    onKeyDown={(e) => checkIsStringLetter(e)}
+                  />
+                  {errors.preferred_job_title && (
+                    <span className="text-red-500 text-xs mt-2 ml-16">
+                      * Job title is required
+                    </span>
+                  )}
+                </div>
               </div>
+            </div>
 
-              <div className="flex flex-row mt-10">
-                <section className="w-1/2 flex">
-                  <div className="flex flex-row">
-                    <MdDashboard className="text-[#2C7FE0] mt-1" />
-                    <div className="flex flex-col ml-2">
-                      <div className="ml-3">Highest Education Level *</div>
+            <div className="flex flex-row mt-10">
+              <div className="flex flex-row">
+                <div>
+                  <MdDashboard className="text-[#2C7FE0] mt-1" />
+                </div>
+                <div>
+                  <div className="flex flex-col ml-3">
+                    <div>Curriculum Vitae</div>
+                    <div className="text-gray-300 text-[12px] mt-3">
+                      Accepted File types
                     </div>
-                  </div>
-                  <div className="flex flex-col items-center ml-14">
-                    <input
-                      type="text"
-                      {...register("highest_level_of_education", {
-                        required: true,
-                      })}
-                      className="bg-gray-50 border border-gray-300 text-gray-900 text-sm rounded-lg focus:ring-blue-500 focus:border-blue-500 block w-full p-2.5"
-                      placeholder="Education"
-                    />
-                    {errors.highest_level_of_education && (
-                      <span className="text-red-500">
-                        This field is required
-                      </span>
-                    )}
-                  </div>
-                </section>
-
-                <section className="w-1/2 flex">
-                  <div className="flex flex-row ml-14">
-                    <MdDashboard className="text-[#2C7FE0] mt-1" />
-                    <div className="flex flex-col">
-                      <div className="text-[15px] font-bold text-gray-500 ml-2">
-                        Year Completed
-                      </div>
-                      <div className="font-[12px] text-gray-300">
-                        Enter Applicant’s *
-                        <br /> Year comp.
+                    <div className="flex flex-row ml-2">
+                      <MdPushPin className="text-gray-300 text-[12px] mt-1" />
+                      <div className="text-gray-300 text-[12px]">pdf | doc</div>
+                    </div>
+                    <div className="flex flex-row ml-2">
+                      <MdPushPin className="text-gray-300 text-[12px] mt-1" />
+                      <div className="text-gray-300 text-[12px]">
+                        jpeg | jpg | png
                       </div>
                     </div>
                   </div>
-                  <div className="flex flex-col items-center ml-9">
-                    <input
-                      type="date"
-                      {...register("year_completed", { required: true })}
-                      className="bg-gray-50 border border-gray-300 text-gray-900 text-sm rounded-lg focus:ring-blue-500 focus:border-blue-500 block w-[14rem] p-2.5"
-                      placeholder="Year"
-                    />
-                    {errors.year_completed && (
-                      <span className="text-red-500">
-                        This field is required
-                      </span>
-                    )}
-                  </div>
-                </section>
-              </div>
-
-              <div className="flex flex-row mt-10 space-x-14">
-                <section className="w-1/2 flex">
-                  <div className="flex flex-row">
-                    <MdDashboard className="text-[#2C7FE0] mt-1" />
-                    <div className="ml-3 flex flex-col">
-                      <div>Education Documents</div>
-                      <div className="text-gray-300 text-[12px] mt-3">
-                        Accepted File types
-                      </div>
-                      <div className="flex flex-row ml-2">
-                        <MdPushPin className="text-gray-300 text-[12px] mt-1" />
-                        <div className="text-gray-300 text-[12px]">
-                          pdf | doc
-                        </div>
-                      </div>
-                      <div className="flex flex-row ml-2">
-                        <MdPushPin className="text-gray-300 text-[12px] mt-1" />
-                        <div className="text-gray-300 text-[12px]">
-                          jpeg | jpg | png
-                        </div>
-                      </div>
-                    </div>
-                  </div>
-
-                  <section className="w-1/2 ml-16">
-                    {!selectedEducationDocument?.file?.name ? (
-                      <label className="flex flex-col items-center justify-center  rounded-lg cursor-pointer bg-[#E5EDF5] hover:bg-gray-100 dark:border-gray-600 dark:hover:border-gray-500 dark:hover:bg-gray-600">
+                </div>
+                <div className="flex flex-row space-x-4 ml-16">
+                  <div className="flex flex-col items-center">
+                    {!selectedCurriculumDocument?.file?.name ? (
+                      <label className="flex flex-col items-center justify-center  rounded-lg cursor-pointer w-[350px] bg-[#E5EDF5] hover:bg-gray-100 dark:border-gray-600 dark:hover:border-gray-500 dark:hover:bg-gray-600">
                         <div className="flex flex-col items-center justify-center pt-5 pb-6">
                           <svg
                             className="w-8 h-8 mb-4 text-gray-500 dark:text-gray-400"
@@ -1169,8 +1385,7 @@ const Home = () => {
                           type="file"
                           name="preferred_job_title" // This will be used to map the file to a form field
                           className="hidden"
-                          required
-                          onChange={handleEducationFileChange} // Handle file selection
+                          onChange={handleCurriculumFileChange} // Handle file selection
                         />
                       </label>
                     ) : (
@@ -1192,191 +1407,21 @@ const Home = () => {
                             />
                           </svg>
                           <span className="text-sm text-gray-700">
-                            {selectedEducationDocument?.file?.name}
+                            {selectedCurriculumDocument?.file?.name}
                           </span>
                         </div>
                         <AiOutlineDelete
                           className="text-red-500 ml-auto cursor-pointer"
                           size={20}
-                          onClick={handleRemoveEducationDocument} // Remove selected document
+                          onClick={handleRemoveCurriculumDocument} // Remove selected document
                         />
                       </div>
                     )}
-                  </section>
-                </section>
-
-                <section className="w-1/2 flex pl-6">
-                  <div className="flex flex-row">
-                    <MdDashboard className="text-[#2C7FE0] mt-1" />
-                    <div className="ml-3 flex flex-col">
-                      <div>Date Received *</div>
-                    </div>
-                  </div>
-                  <div className="relative max-w-sm ml-3">
-                    <input
-                      id="datepicker-format"
-                      datepicker-format="mm-dd-yyyy"
-                      type="date"
-                      {...register("date_received", {
-                        required: true,
-                      })}
-                      className=" w-46 px-6   bg-gray-50 border border-gray-300 text-gray-900 text-sm rounded-lg focus:ring-blue-500 focus:border-blue-500 block w-[14rem] ml-16 p-2.5 dark:placeholder-gray-400 dark:focus:ring-blue-500 dark:focus:border-blue-500"
-                      placeholder="Select date"
-                    />
-                  </div>
-                </section>
-              </div>
-
-              <hr className="my-4 border-t border-gray-300 mt-10" />
-              <div className="mt-10">
-                <h2 className="text-md font-semibold mb-2 text-[#2C7DD6]">
-                  Work Experience
-                </h2>
-              </div>
-
-              <div className="flex flex-row mt-10">
-                <section className="w-1/2 flex">
-                  <div className="flex flex-row">
-                    <div className="flex flex-row">
-                      <MdDashboard className="text-[#2C7FE0] mt-1" />
-                      <div className="flex flex-col ml-1">
-                        <div className="ml-3">Professional Skill</div>
-                      </div>
-                    </div>
-                    <div className="flex flex-col items-center">
-                      <input
-                        {...register("professional_skill")}
-                        type="text"
-                        className="bg-gray-50 border ml-[54%] border-gray-300 text-gray-900 text-sm rounded-lg focus:ring-blue-500 focus:border-blue-500 block p-2.5 dark:placeholder-gray-400 dark:text-black dark:focus:ring-blue-500 dark:focus:border-blue-500"
-                        placeholder="Skill"
-                      onKeyDown={e => checkIsStringLetter(e)}
-                      />
-                      {errors.professional_skill && (
-                        <span className="text-red-500">
-                          {errors.professional_skill.message}
-                        </span>
-                      )}
-                    </div>
-                  </div>
-                </section>
-
-                <div className="flex flex-row ml-12">
-                  <div>
-                    <MdDashboard className="text-[#2C7FE0] mt-1" />
-                  </div>
-                  <div className="flex flex-col">
-                    <div className="text-[15px] font-bold text-gray-500 ml-1">
-                      Preferred Job Title
-                    </div>
-                  </div>
-                  <div className="flex flex-col items-center">
-                    <input
-                      {...register("preferred_job_title")}
-                      type="text"
-                      className="bg-gray-50 border ml-11 border-gray-300 text-gray-900 text-sm rounded-lg focus:ring-blue-500 focus:border-blue-500 block p-2.5 dark:placeholder-gray-400 dark:text-black dark:focus:ring-blue-500 dark:focus:border-blue-500"
-                      placeholder="Job Title"
-                      onKeyDown={e => checkIsStringLetter(e)}
-                    />
-                    {errors.preferred_job_title && (
-                      <span className="text-red-500">
-                        {errors.preferred_job_title.message}
-                      </span>
-                    )}
-                  </div>
-                </div>
-              </div>
-
-              <div className="flex flex-row mt-10">
-                <div className="flex flex-row">
-                  <div>
-                    <MdDashboard className="text-[#2C7FE0] mt-1" />
-                  </div>
-                  <div>
-                    <div className="flex flex-col ml-3">
-                      <div>Curriculum Vitae</div>
-                      <div className="text-gray-300 text-[12px] mt-3">
-                        Accepted File types
-                      </div>
-                      <div className="flex flex-row ml-2">
-                        <MdPushPin className="text-gray-300 text-[12px] mt-1" />
-                        <div className="text-gray-300 text-[12px]">
-                          pdf | doc
-                        </div>
-                      </div>
-                      <div className="flex flex-row ml-2">
-                        <MdPushPin className="text-gray-300 text-[12px] mt-1" />
-                        <div className="text-gray-300 text-[12px]">
-                          jpeg | jpg | png
-                        </div>
-                      </div>
-                    </div>
-                  </div>
-                  <div className="flex flex-row space-x-4 ml-16">
-                    <div className="flex flex-col items-center">
-                      {!selectedCurriculumDocument?.file?.name ? (
-                        <label className="flex flex-col items-center justify-center  rounded-lg cursor-pointer w-[350px] bg-[#E5EDF5] hover:bg-gray-100 dark:border-gray-600 dark:hover:border-gray-500 dark:hover:bg-gray-600">
-                          <div className="flex flex-col items-center justify-center pt-5 pb-6">
-                            <svg
-                              className="w-8 h-8 mb-4 text-gray-500 dark:text-gray-400"
-                              aria-hidden="true"
-                              xmlns="http://www.w3.org/2000/svg"
-                              fill="none"
-                              viewBox="0 0 20 16"
-                            >
-                              <path
-                                stroke="currentColor"
-                                strokeLinecap="round"
-                                strokeLinejoin="round"
-                                strokeWidth="2"
-                                d="M13 13h3a3 3 0 0 0 0-6h-.025A5.56 5.56 0 0 0 16 6.5 5.5 5.5 0 0 0 5.207 5.021C5.137 5.017 5.071 5 5 5a4 4 0 0 0 0 8h2.167M10 15V6m0 0L8 8m2-2 2 2"
-                              />
-                            </svg>
-                            <p className="mb-2 text-sm text-gray-300 font-[12px]">
-                              Click to choose document type
-                            </p>
-                          </div>
-                          <input
-                            id="dropzone-file"
-                            type="file"
-                            name="preferred_job_title" // This will be used to map the file to a form field
-                            className="hidden"
-                            onChange={handleCurriculumFileChange} // Handle file selection
-                          />
-                        </label>
-                      ) : (
-                        // Display selected document card with remove icon
-                        <div className="flex flex-row items-center bg-gray-200 p-3 rounded-lg w-full">
-                          <div className="flex flex-row items-center">
-                            <svg
-                              className="w-6 h-6 text-gray-500 mr-2"
-                              xmlns="http://www.w3.org/2000/svg"
-                              fill="none"
-                              viewBox="0 0 20 16"
-                            >
-                              <path
-                                stroke="currentColor"
-                                strokeLinecap="round"
-                                strokeLinejoin="round"
-                                strokeWidth="2"
-                                d="M13 13h3a3 3 0 0 0 0-6h-.025A5.56 5.56 0 0 0 16 6.5 5.5 5.5 0 0 0 5.207 5.021C5.137 5.017 5.071 5 5 5a4 4 0 0 0 0 8h2.167M10 15V6m0 0L8 8m2-2 2 2"
-                              />
-                            </svg>
-                            <span className="text-sm text-gray-700">
-                              {selectedCurriculumDocument?.file?.name}
-                            </span>
-                          </div>
-                          <AiOutlineDelete
-                            className="text-red-500 ml-auto cursor-pointer"
-                            size={20}
-                            onClick={handleRemoveCurriculumDocument} // Remove selected document
-                          />
-                        </div>
-                      )}
-                    </div>
                   </div>
                 </div>
               </div>
             </div>
+
             <div className="flex flex-row gap-4 mt-10 w-full justify-end ">
               <div
                 onClick={() => handleCancel()}
@@ -1384,9 +1429,7 @@ const Home = () => {
               >
                 Cancel
               </div>
-              <button
-              onClick={() => console.log("=====>",errors)}
-              className="flex items-center justify-center w-56  bg-[#2C7DD6] text-white py-2 px-4 rounded-md">
+              <button className="flex items-center justify-center w-56  bg-[#2C7DD6] text-white py-2 px-4 rounded-md">
                 {loading ? (
                   <AiOutlineLoading3Quarters className="animate-spin mr-2 text-white" />
                 ) : (
